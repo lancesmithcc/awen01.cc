@@ -86,8 +86,10 @@
 		this.canvas.setAttribute('aria-hidden', 'true');
 		this.ctx = this.canvas.getContext('2d');
 		this.rect = { left: 0, top: 0, width: 0, height: 0 };
-		this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+		this.dpr = Math.min(window.devicePixelRatio || 1, this.cfg.maxDpr || 1);
 		this.inited = false;
+		this.lastRender = 0;
+		this.frameInterval = 1 / (this.cfg.fps || 24);
 
 		var fixed = host === document.body || host.id === 'ultrabgs-page-layer';
 		this.fixed = fixed;
@@ -141,6 +143,10 @@
 	Instance.prototype.frame = function (t, dt) {
 		var pack = registry[this.packId];
 		if (!pack) { return; }
+		if (!this.fixed && (this.rect.bottom < -120 || this.rect.top > window.innerHeight + 120)) { return; }
+		if (this.inited && this.lastRender && t - this.lastRender < this.frameInterval) { return; }
+		var renderDt = this.lastRender ? Math.min(0.1, t - this.lastRender) : dt;
+		this.lastRender = t;
 
 		var now = performance.now();
 		var taps = [];
@@ -153,7 +159,7 @@
 		}
 
 		var frame = {
-			w: this.w, h: this.h, t: t, dt: dt,
+			w: this.w, h: this.h, t: t, dt: renderDt,
 			pointer: {
 				x: input.px - this.rect.left,
 				y: input.py - this.rect.top,
@@ -262,6 +268,8 @@
 			if (cfg.speed != null) { out.speed = clamp(+cfg.speed || 1, 0.1, 3); }
 			if (cfg.density != null) { out.density = clamp(+cfg.density || 1, 0.3, 2); }
 			if (cfg.zIndex != null) { out.zIndex = Math.round(clamp(+cfg.zIndex || 0, -100, 100)); }
+			if (cfg.fps != null) { out.fps = Math.round(clamp(+cfg.fps || 30, 12, 60)); }
+			if (cfg.maxDpr != null) { out.maxDpr = clamp(+cfg.maxDpr || 1, 0.75, 2); }
 			return out;
 		},
 		scan: function (root) {

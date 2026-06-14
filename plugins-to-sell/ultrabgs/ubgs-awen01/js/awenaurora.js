@@ -9,7 +9,7 @@
 
 		init: function (state, f) {
 			state.ribbonCount = Math.max(4, Math.round(5 * f.density));
-			state.samples = Math.max(64, Math.round(96 * f.density));
+			state.samples = Math.max(44, Math.round(68 * f.density));
 			state.loopSeconds = 36;
 			state.react = 0;
 			state.sway = 0;
@@ -59,7 +59,7 @@
 
 			ctx.save();
 			ctx.globalCompositeOperation = 'screen';
-			ctx.filter = 'blur(13px)';
+			ctx.filter = 'blur(7px)';
 
 			for (var r = 0; r < state.ribbonCount; r++) {
 				var ribbon = state.ribbons[r];
@@ -107,7 +107,7 @@
 				ctx.fill();
 			}
 
-			ctx.filter = 'blur(30px)';
+			ctx.filter = 'blur(14px)';
 			for (var g = 0; g < 3; g++) {
 				var c = colors[(g + 1) % colors.length];
 				var gx = f.w * (0.18 + g * 0.29 + Math.sin(theta * (g + 1) + g) * 0.025);

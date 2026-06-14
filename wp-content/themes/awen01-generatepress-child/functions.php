@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const AWEN01_CHILD_VERSION = '0.1.3';
+const AWEN01_CHILD_VERSION = '0.1.4';
 
 add_action( 'wp_enqueue_scripts', 'awen01_child_enqueue_assets', 20 );
 add_action( 'enqueue_block_editor_assets', 'awen01_child_enqueue_assets', 20 );
@@ -195,20 +195,27 @@ function awen01_child_print_global_motifs() {
 	if ( is_admin() ) {
 		return;
 	}
+	if ( is_front_page() ) {
+		return;
+	}
 
 	$aurora_config = awen01_child_ultrabgs_config_attr( array(
 		'colors'  => array( '#050b0a', '#36d6c7', '#a98bff' ),
 		'opacity' => 0.56,
 		'speed'   => 0.82,
-		'density' => 1.35,
+		'density' => 0.92,
 		'zIndex'  => 0,
+		'fps'     => 20,
+		'maxDpr'  => 1,
 	) );
 	$node_config = awen01_child_ultrabgs_config_attr( array(
 		'colors'  => array( '#36d6c7', '#a98bff', '#6b9cff' ),
 		'opacity' => 0.68,
 		'speed'   => 0.72,
-		'density' => 1.05,
+		'density' => 0.78,
 		'zIndex'  => 1,
+		'fps'     => 20,
+		'maxDpr'  => 1,
 	) );
 	?>
 	<div class="awen-global-bg awen-global-bg--aurora" data-ultrabgs="awenaurora" data-ubgs-config="<?php echo $aurora_config; ?>" aria-hidden="true"></div>

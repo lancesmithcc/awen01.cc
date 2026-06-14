@@ -8,7 +8,7 @@
 		name: 'AWEN01 Circle Node Lines',
 
 		init: function (state, f) {
-			var count = Math.max(34, Math.round(58 * f.density));
+			var count = Math.max(22, Math.round(34 * f.density));
 			state.loopSeconds = 28;
 			state.react = 0;
 			state.pointerX = f.w * 0.5;
@@ -42,7 +42,7 @@
 				{ r: 107, g: 156, b: 255 }
 			];
 			var pts = state.points;
-			var maxDist = Math.max(165, 250 * f.density);
+			var maxDist = Math.max(150, 220 * f.density);
 			var targetReact = f.pointer.active ? 1 : 0;
 			state.react = U.lerp(state.react || 0, targetReact, ease * 0.52);
 			state.pointerX = U.lerp(state.pointerX || f.w * 0.5, f.pointer.active ? f.pointer.x : f.w * 0.5, ease * 0.48);
@@ -53,7 +53,7 @@
 			ctx.lineCap = 'round';
 			ctx.lineJoin = 'round';
 			ctx.globalCompositeOperation = 'screen';
-			ctx.shadowBlur = 10;
+			ctx.shadowBlur = 5;
 
 			for (var i = 0; i < pts.length; i++) {
 				var p = pts[i];
@@ -112,7 +112,7 @@
 				ctx.beginPath();
 				ctx.arc(node.px, node.py, Math.max(1.15, radius * 0.24), 0, Math.PI * 2);
 				ctx.fill();
-				ctx.shadowBlur = 10;
+				ctx.shadowBlur = 5;
 			}
 
 			ctx.restore();

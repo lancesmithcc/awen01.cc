@@ -5,6 +5,7 @@
 html{background:var(--awen-bg)}
 body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var(--bsc-font-family-body,"Jost",system-ui,sans-serif);font-weight:300;letter-spacing:0}
 .awen01-brand .site,.awen01-brand #page,.awen01-brand .site-content,.awen01-brand .content-area,.awen01-brand .inside-article,.awen01-brand .site-main,.awen01-brand .entry-content{background:transparent!important}
+.awen01-brand .site.grid-container,.awen01-brand .site-content,.awen01-brand .content-area,.awen01-brand .site-main,.awen01-brand .inside-article{box-sizing:border-box;margin-left:0;margin-right:0;max-width:none!important;padding-left:0!important;padding-right:0!important;width:100%!important}
 .awen-global-bg{inset:0;overflow:hidden;pointer-events:none;position:fixed;z-index:0}
 .awen-global-bg--aurora{mix-blend-mode:screen;opacity:.78}
 .awen-global-bg--nodes{mix-blend-mode:screen;opacity:.86}
