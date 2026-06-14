@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const AWEN01_CHILD_VERSION = '0.1.4';
+const AWEN01_CHILD_VERSION = '0.1.5';
 
 add_action( 'wp_enqueue_scripts', 'awen01_child_enqueue_assets', 20 );
 add_action( 'enqueue_block_editor_assets', 'awen01_child_enqueue_assets', 20 );
@@ -145,15 +145,19 @@ function awen01_child_motion_standards_section() {
 		'colors'  => array( '#08110f', '#36d6c7', '#a98bff' ),
 		'opacity' => 0.86,
 		'speed'   => 0.65,
-		'density' => 1.15,
+		'density' => 0.74,
 		'zIndex'  => 0,
+		'fps'     => 18,
+		'maxDpr'  => 0.65,
 	) );
 	$node_config = awen01_child_ultrabgs_config_attr( array(
 		'colors'  => array( '#36d6c7', '#a98bff', '#6b9cff' ),
 		'opacity' => 0.76,
 		'speed'   => 0.5,
-		'density' => 1.05,
+		'density' => 0.62,
 		'zIndex'  => 1,
+		'fps'     => 18,
+		'maxDpr'  => 0.65,
 	) );
 	ob_start();
 	?>
@@ -205,8 +209,8 @@ function awen01_child_print_global_motifs() {
 		'speed'   => 0.82,
 		'density' => 0.92,
 		'zIndex'  => 0,
-		'fps'     => 20,
-		'maxDpr'  => 1,
+		'fps'     => 16,
+		'maxDpr'  => 0.6,
 	) );
 	$node_config = awen01_child_ultrabgs_config_attr( array(
 		'colors'  => array( '#36d6c7', '#a98bff', '#6b9cff' ),
@@ -214,8 +218,8 @@ function awen01_child_print_global_motifs() {
 		'speed'   => 0.72,
 		'density' => 0.78,
 		'zIndex'  => 1,
-		'fps'     => 20,
-		'maxDpr'  => 1,
+		'fps'     => 16,
+		'maxDpr'  => 0.6,
 	) );
 	?>
 	<div class="awen-global-bg awen-global-bg--aurora" data-ultrabgs="awenaurora" data-ubgs-config="<?php echo $aurora_config; ?>" aria-hidden="true"></div>

@@ -3,7 +3,7 @@
  * Plugin Name:       UltraBGs
  * Plugin URI:        https://awen01.cc
  * Description:       Motion, hover, scroll and tap responsive animated background layers for single blocks or the whole page. Extensible animation pack architecture.
- * Version:           1.1.3
+ * Version:           1.1.4
  * Author:      AWEN01
  * Author URI:  https://awen01.cc
  * License:           GPL-2.0-or-later
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ULTRABGS_VERSION', '1.1.3' );
+define( 'ULTRABGS_VERSION', '1.1.4' );
 define( 'ULTRABGS_URL', plugin_dir_url( __FILE__ ) );
 define( 'ULTRABGS_PATH', plugin_dir_path( __FILE__ ) );
 

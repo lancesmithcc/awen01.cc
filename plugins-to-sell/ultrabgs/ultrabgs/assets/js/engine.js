@@ -86,10 +86,10 @@
 		this.canvas.setAttribute('aria-hidden', 'true');
 		this.ctx = this.canvas.getContext('2d');
 		this.rect = { left: 0, top: 0, width: 0, height: 0 };
-		this.dpr = Math.min(window.devicePixelRatio || 1, this.cfg.maxDpr || 1);
+		this.dpr = Math.min(window.devicePixelRatio || 1, this.cfg.maxDpr || 0.65);
 		this.inited = false;
 		this.lastRender = 0;
-		this.frameInterval = 1 / (this.cfg.fps || 24);
+		this.frameInterval = 1 / (this.cfg.fps || 18);
 
 		var fixed = host === document.body || host.id === 'ultrabgs-page-layer';
 		this.fixed = fixed;
@@ -202,6 +202,11 @@
 	var rectTick = 0;
 
 	function loop(now) {
+		if (document.hidden) {
+			prevT = now;
+			rafId = requestAnimationFrame(loop);
+			return;
+		}
 		var dt = Math.min(0.05, (now - prevT) / 1000);
 		prevT = now;
 		var t = (now - startT) / 1000;
@@ -268,8 +273,8 @@
 			if (cfg.speed != null) { out.speed = clamp(+cfg.speed || 1, 0.1, 3); }
 			if (cfg.density != null) { out.density = clamp(+cfg.density || 1, 0.3, 2); }
 			if (cfg.zIndex != null) { out.zIndex = Math.round(clamp(+cfg.zIndex || 0, -100, 100)); }
-			if (cfg.fps != null) { out.fps = Math.round(clamp(+cfg.fps || 30, 12, 60)); }
-			if (cfg.maxDpr != null) { out.maxDpr = clamp(+cfg.maxDpr || 1, 0.75, 2); }
+			if (cfg.fps != null) { out.fps = Math.round(clamp(+cfg.fps || 18, 10, 60)); }
+			if (cfg.maxDpr != null) { out.maxDpr = clamp(+cfg.maxDpr || 0.65, 0.45, 2); }
 			return out;
 		},
 		scan: function (root) {

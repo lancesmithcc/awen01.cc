@@ -8,7 +8,8 @@
 		name: 'AWEN01 Circle Node Lines',
 
 		init: function (state, f) {
-			var count = Math.max(22, Math.round(34 * f.density));
+			var density = Math.min(f.density, 0.8);
+			var count = Math.max(14, Math.round(24 * density));
 			state.loopSeconds = 28;
 			state.react = 0;
 			state.pointerX = f.w * 0.5;
@@ -42,7 +43,7 @@
 				{ r: 107, g: 156, b: 255 }
 			];
 			var pts = state.points;
-			var maxDist = Math.max(150, 220 * f.density);
+			var maxDist = Math.max(130, 185 * Math.min(f.density, 0.9));
 			var targetReact = f.pointer.active ? 1 : 0;
 			state.react = U.lerp(state.react || 0, targetReact, ease * 0.52);
 			state.pointerX = U.lerp(state.pointerX || f.w * 0.5, f.pointer.active ? f.pointer.x : f.w * 0.5, ease * 0.48);
@@ -53,7 +54,7 @@
 			ctx.lineCap = 'round';
 			ctx.lineJoin = 'round';
 			ctx.globalCompositeOperation = 'screen';
-			ctx.shadowBlur = 5;
+			ctx.shadowBlur = 0;
 
 			for (var i = 0; i < pts.length; i++) {
 				var p = pts[i];
@@ -83,7 +84,6 @@
 					if (dist > maxDist) { continue; }
 					var strength = Math.pow(1 - dist / maxDist, 1.52);
 					var col = colors[(a + b) % colors.length];
-					ctx.shadowColor = U.rgba(col, 0.22 * strength * hover);
 					ctx.strokeStyle = U.rgba(col, Math.min(0.92, strength * 0.9 * (f.opacity || 0.85) * hover));
 					ctx.lineWidth = 1.15 + strength * 2.1;
 					ctx.beginPath();
@@ -98,7 +98,6 @@
 				var c = colors[n % colors.length];
 				var pulse = 0.5 + 0.5 * Math.sin(theta * 2 + node.phase);
 				var radius = node.r + pulse * 1.7 + state.react * 0.6;
-				ctx.shadowColor = U.rgba(c, 0.45 * hover);
 				ctx.fillStyle = U.rgba(c, 0.26 * (f.opacity || 0.85) * hover);
 				ctx.strokeStyle = U.rgba(c, Math.min(1, (0.78 + pulse * 0.38) * (f.opacity || 0.85) * hover));
 				ctx.lineWidth = 1.7;
@@ -112,7 +111,7 @@
 				ctx.beginPath();
 				ctx.arc(node.px, node.py, Math.max(1.15, radius * 0.24), 0, Math.PI * 2);
 				ctx.fill();
-				ctx.shadowBlur = 5;
+				ctx.shadowBlur = 0;
 			}
 
 			ctx.restore();

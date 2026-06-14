@@ -8,8 +8,9 @@
 		name: 'AWEN01 Smooth Aurora',
 
 		init: function (state, f) {
-			state.ribbonCount = Math.max(4, Math.round(5 * f.density));
-			state.samples = Math.max(44, Math.round(68 * f.density));
+			var density = Math.min(f.density, 0.85);
+			state.ribbonCount = Math.max(3, Math.round(4 * density));
+			state.samples = Math.max(26, Math.round(42 * density));
 			state.loopSeconds = 36;
 			state.react = 0;
 			state.sway = 0;
@@ -59,7 +60,7 @@
 
 			ctx.save();
 			ctx.globalCompositeOperation = 'screen';
-			ctx.filter = 'blur(7px)';
+			ctx.filter = 'none';
 
 			for (var r = 0; r < state.ribbonCount; r++) {
 				var ribbon = state.ribbons[r];
@@ -107,13 +108,13 @@
 				ctx.fill();
 			}
 
-			ctx.filter = 'blur(14px)';
+			ctx.filter = 'none';
 			for (var g = 0; g < 3; g++) {
 				var c = colors[(g + 1) % colors.length];
 				var gx = f.w * (0.18 + g * 0.29 + Math.sin(theta * (g + 1) + g) * 0.025);
 				var gy = f.h * (0.17 + Math.cos(theta * (g + 2) + g) * 0.045);
 				var glow = ctx.createRadialGradient(gx, gy, 0, gx, gy + f.h * 0.04, f.w * 0.34);
-				glow.addColorStop(0, U.rgba(c, 0.095 * hover));
+				glow.addColorStop(0, U.rgba(c, 0.055 * hover));
 				glow.addColorStop(1, U.rgba(c, 0));
 				ctx.fillStyle = glow;
 				ctx.fillRect(0, 0, f.w, f.h);
