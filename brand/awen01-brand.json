@@ -1,0 +1,309 @@
+{
+  "sections": {
+    "identity": true,
+    "voice": true,
+    "context": true
+  },
+  "identity": {
+    "name": "AWEN01.cc",
+    "tagline": "Old wisdom for the coming world.",
+    "mission": "AWEN01 is a creative collective making music, visionary art, visionary writing, and wisdom work for a culture being transformed by technology. We bridge old druidic ways and the spiritual lineage of the fae into the new world with heart, imagination, and disciplined beauty."
+  },
+  "logo_rules": {
+    "dos": [
+      "Use the mark with generous clearspace, at least the height of the inner glyph around all sides.",
+      "Place the logo on deep labradorite, moon white, or neutral threshold grey backgrounds.",
+      "Let the logo breathe. It should feel like a sigil, not an app icon."
+    ],
+    "donts": [
+      "Do not add neon glows, drop shadows, bevels, or extra gradients to the logo.",
+      "Do not place the logo over busy AI imagery or dense node fields.",
+      "Do not stretch, rotate, outline, or recolor the mark outside approved palette tokens."
+    ]
+  },
+  "lockups": [],
+  "colors": [
+    {
+      "slug": "labradorite-ink",
+      "name": "Labradorite Ink",
+      "hex": "#08110f",
+      "role": "primary",
+      "usage": "Dark mode foundation, immersive sections, headers, and footer."
+    },
+    {
+      "slug": "black-opal",
+      "name": "Black Opal",
+      "hex": "#12151a",
+      "role": "neutral",
+      "usage": "Dark cards, editorial plates, and secondary dark surfaces."
+    },
+    {
+      "slug": "deep-green",
+      "name": "Deep Green",
+      "hex": "#0e2a22",
+      "role": "secondary",
+      "usage": "Forest-depth sections, nav states, and quiet emphasis."
+    },
+    {
+      "slug": "aurora-teal",
+      "name": "Aurora Teal",
+      "hex": "#36d6c7",
+      "role": "accent",
+      "usage": "Primary action color, active state, and sparse aurora highlights."
+    },
+    {
+      "slug": "aurora-blue",
+      "name": "Aurora Blue",
+      "hex": "#6b9cff",
+      "role": "accent",
+      "usage": "Secondary spectral accent for motion gradients and diagrams."
+    },
+    {
+      "slug": "opal-violet",
+      "name": "Opal Violet",
+      "hex": "#a98bff",
+      "role": "accent",
+      "usage": "Mystic accent, mode transitions, art and writing moments."
+    },
+    {
+      "slug": "moon-white",
+      "name": "Moon White",
+      "hex": "#f7f8fb",
+      "role": "surface",
+      "usage": "Light mode foundation and long-form reading surfaces."
+    },
+    {
+      "slug": "lavender-opal",
+      "name": "Lavender Opal",
+      "hex": "#ded8ff",
+      "role": "secondary",
+      "usage": "Light mode washes, quiet emphasis, and gentle panels."
+    },
+    {
+      "slug": "rose-mist",
+      "name": "Rose Mist",
+      "hex": "#f4c9df",
+      "role": "accent",
+      "usage": "Soft warmth in light mode, human counterpoint to technology."
+    },
+    {
+      "slug": "pastel-moss",
+      "name": "Pastel Moss",
+      "hex": "#cce7d0",
+      "role": "accent",
+      "usage": "Light ecological accent, wisdom and restoration cues."
+    },
+    {
+      "slug": "threshold-grey",
+      "name": "Threshold Grey",
+      "hex": "#8f9496",
+      "role": "neutral",
+      "usage": "Transcendent mode foundation and liminal UI backgrounds."
+    },
+    {
+      "slug": "mist-slate",
+      "name": "Mist Slate",
+      "hex": "#606a70",
+      "role": "text",
+      "usage": "Muted text, borders, and transcendent mode contrast."
+    },
+    {
+      "slug": "muted-labradorite",
+      "name": "Muted Labradorite",
+      "hex": "#4f7c72",
+      "role": "secondary",
+      "usage": "Transcendent mode green, dividers, and calm emphasis."
+    },
+    {
+      "slug": "muted-lavender",
+      "name": "Muted Lavender",
+      "hex": "#aaa0c4",
+      "role": "secondary",
+      "usage": "Transcendent mode soft spectral accent."
+    },
+    {
+      "slug": "ink-text",
+      "name": "Ink Text",
+      "hex": "#1d2527",
+      "role": "ink",
+      "usage": "Primary text on light and transcendent surfaces."
+    }
+  ],
+  "typography": {
+    "fonts": [
+      {
+        "role": "heading",
+        "family": "Jost",
+        "fallback": "system-ui, sans-serif",
+        "source": "google",
+        "weights": [
+          300,
+          700
+        ],
+        "url": "https://fonts.googleapis.com/css2?family=Jost:wght@300;700&display=swap"
+      },
+      {
+        "role": "body",
+        "family": "Jost",
+        "fallback": "system-ui, sans-serif",
+        "source": "google",
+        "weights": [
+          300,
+          700
+        ],
+        "url": "https://fonts.googleapis.com/css2?family=Jost:wght@300;700&display=swap"
+      }
+    ],
+    "scale": {
+      "base_px": 18,
+      "ratio": 1.25,
+      "levels": {
+        "caption": -1,
+        "body": 0,
+        "h6": 1,
+        "h5": 1,
+        "h4": 2,
+        "h3": 3,
+        "h2": 4,
+        "h1": 5
+      }
+    },
+    "line_height": {
+      "heading": 1.08,
+      "body": 1.72
+    },
+    "notes": "Use Jost 300 for body, metadata, captions, and atmospheric phrases. Use Jost 700 for headings, section labels, navigation, and CTAs. Display type should be large but spacious, never cramped."
+  },
+  "spacing": {
+    "base_px": 8,
+    "scale": [
+      0.5,
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      12,
+      16
+    ],
+    "notes": "Use an 8px grid. Let immersive sections breathe with larger intervals. Keep UI controls tighter and exact."
+  },
+  "layout": {
+    "grid_columns": 12,
+    "gutter_px": 24,
+    "margin": "clamp(24px,5vw,96px)",
+    "max_width_px": 1180,
+    "principles": [
+      "Compose pages as threshold sequences: dark immersion, light clarity, muted integration.",
+      "Use low-poly node fields as background atmosphere, never behind small body text.",
+      "Keep the first viewport focused on one message and one primary action.",
+      "Treat whitespace as ceremony: generous, calm, and intentional."
+    ]
+  },
+  "context": {
+    "intro": "AWEN01 appears across music releases, essays, artwork, rituals, digital products, and community portals. The system should scale from album-art atmosphere to sober editorial guidance. Motion is part of the identity: aurora fields and living node matrices are approved motif systems when used with restraint.",
+    "items": []
+  },
+  "motion": {
+    "principle": "Motion is a brand motif, not decoration. It should feel like old starlore meeting living signal.",
+    "implementation": "UltraBGs owns animated backgrounds. AWEN01 supplies brand presets, editor classes, and usage standards.",
+    "aurora_borealis": {
+      "class": "awen-aurora",
+      "ultrabgs_pack": "awenaurora",
+      "usage": "Use on immersive dark and threshold sections. Keep the gradient slow, soft, and text-safe.",
+      "palette": [
+        "labradorite-ink",
+        "deep-green",
+        "aurora-teal",
+        "aurora-blue",
+        "opal-violet"
+      ],
+      "tempo": "18s-34s loops, alternate direction, ease-in-out",
+      "reduced_motion": "Freeze at a calm gradient state when prefers-reduced-motion is enabled."
+    },
+    "low_poly_node_matrix": {
+      "class": "awen-node-matrix",
+      "ultrabgs_pack": "awennodes",
+      "usage": "Use as sparse connective tissue behind hero, music, writing, and portal sections. Never place dense nodes under body copy.",
+      "behavior": "Nodes pulse, drift, and morph between triangular connections like a star map or mycelial network.",
+      "density": "18-54 nodes depending on section size, low opacity, wide spacing.",
+      "reduced_motion": "Render a static, low-opacity node field."
+    },
+    "wordpress_editing": {
+      "instructions": "Use the UltraBGs panel on GenerateBlocks containers. For layered AWEN sections, use awenaurora on the main section and awennodes on an absolute child overlay. Keep AWEN brand classes for readability.",
+      "classes": [
+        "awen-aurora",
+        "awen-node-matrix",
+        "awen-motif-field",
+        "awen-mode-light",
+        "awen-mode-transcendent"
+      ]
+    }
+  },
+  "ratios": {
+    "layout": [
+      {
+        "label": "Threshold split",
+        "value": "5:7"
+      },
+      {
+        "label": "Editorial plate",
+        "value": "4:3"
+      },
+      {
+        "label": "Cinematic field",
+        "value": "16:9"
+      }
+    ],
+    "image_aspects": [
+      "16:9",
+      "4:3",
+      "1:1",
+      "3:4"
+    ]
+  },
+  "imagery": {
+    "style": "Opalescent natural intelligence: aurora gradients, labradorite mineral light, misty forest thresholds, sparse node matrices, low-poly constellations, handwritten wisdom fragments, and luminous sound-wave forms. Imagery should feel ceremonial and technologically aware, not psychedelic clutter.",
+    "dos": [
+      "Use slow aurora gradients and mineral color shifts as atmosphere.",
+      "Combine old-world organic forms with precise digital geometry.",
+      "Preserve dark negative space for type and navigation.",
+      "Use muted light-mode imagery for reading surfaces."
+    ],
+    "donts": [
+      "Do not use generic fantasy castles, neon hacker code, or busy rainbow gradients.",
+      "Do not use AI-generated people as proof of real community.",
+      "Do not place small text over high-frequency texture.",
+      "Do not let motion overpower reading."
+    ],
+    "treatments": "Aurora overlays should be low opacity and slow, moving like realistic borealis light across labradorite. Low-poly node matrices should use fine linework with circle nodes, pulsing like a star map, mycelial signal field, or living constellation. Use UltraBGs packs `awenaurora` and `awennodes` on GenerateBlocks containers, retaining `awen-aurora` and `awen-node-matrix` as readable brand classes. Respect prefers-reduced-motion."
+  },
+  "tone": {
+    "enabled": true,
+    "attributes": [
+      "visionary",
+      "warm",
+      "lucid",
+      "initiated",
+      "grounded"
+    ],
+    "guidelines": "Speak as a guide at a threshold. Use mythic language only when it clarifies the feeling. Balance wonder with concrete action. Prefer short, resonant sentences over abstract spiritual fog.",
+    "examples": [
+      {
+        "do": "We carry old wisdom into new systems with heart.",
+        "dont": "We empower paradigm-shifting consciousness activations for your journey."
+      },
+      {
+        "do": "Technology is changing the human field. AWEN01 makes art for crossing with care.",
+        "dont": "The future is here and we are disrupting creativity forever."
+      }
+    ]
+  },
+  "ai": {
+    "text_provider": "openrouter",
+    "text_model": "deepseek/deepseek-chat-v3",
+    "fal_vector_model": "fal-ai/recraft/v3/text-to-image",
+    "fal_raster_model": "fal-ai/gpt-image-1/text-to-image"
+  }
+}

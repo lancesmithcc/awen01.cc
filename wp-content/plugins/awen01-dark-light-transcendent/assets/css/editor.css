@@ -1,0 +1,7 @@
+.awen-dlt-panel .components-base-control{margin-bottom:16px}
+.awen-dlt-panel .components-base-control__label{font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.04em}
+.awen-dlt-media-row img{display:block;max-height:120px;object-fit:cover}
+
+.customize-control-color.awen-dlt-control .customize-control-description{align-items:center;display:flex;gap:.5rem}
+.awen-dlt-light-ref{border:1px solid rgba(0,0,0,.15);border-radius:3px;display:inline-block;flex:0 0 auto;height:16px;vertical-align:middle;width:16px}
+.awen-dlt-light-ref-label{color:#555;font-family:Menlo,Consolas,monospace;font-size:11px}

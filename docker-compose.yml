@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${AWEN_DB_NAME:-awen01}
+      MARIADB_USER: ${AWEN_DB_USER:-awen01}
+      MARIADB_PASSWORD: ${AWEN_DB_PASSWORD:-change-me}
+      MARIADB_ROOT_PASSWORD: ${AWEN_DB_ROOT_PASSWORD:-change-me-root}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${AWEN_WP_PORT:-8091}:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${AWEN_DB_NAME:-awen01}
+      WORDPRESS_DB_USER: ${AWEN_DB_USER:-awen01}
+      WORDPRESS_DB_PASSWORD: ${AWEN_DB_PASSWORD:-change-me}
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_DEBUG', true );
+        define( 'WP_DEBUG_LOG', true );
+        define( 'WP_ENVIRONMENT_TYPE', 'local' );
+    volumes:
+      - wordpress_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./:/var/www/project
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${AWEN_DB_NAME:-awen01}
+      WORDPRESS_DB_USER: ${AWEN_DB_USER:-awen01}
+      WORDPRESS_DB_PASSWORD: ${AWEN_DB_PASSWORD:-change-me}
+    user: "33:33"
+    working_dir: /var/www/html
+    volumes:
+      - wordpress_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./:/var/www/project
+
+volumes:
+  db_data:
+  wordpress_core:

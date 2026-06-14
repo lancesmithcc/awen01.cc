@@ -1,0 +1,22 @@
+/* Brand guide — print/PDF. Exact colors, sectioned page breaks, chrome hidden,
+   reveals forced visible. */
+
+@page { margin: 0; size: letter portrait; }
+
+.bsc-guide { max-width: none; }
+.bsc-guide * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* reveals must not hide content in headless/print rendering */
+.bsc-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+.bsc-g-downloads, .bsc-g-btn { display: none !important; }
+header.site-header, footer.site-footer, .site-header, .site-footer, #masthead, #colophon,
+nav, .wp-block-navigation, .sidebar, #comments, .comments-area, .entry-title, .page-header { display: none !important; }
+
+.bsc-g-cover { min-height: 95vh; page-break-after: always; }
+.bsc-g-section { page-break-inside: avoid; break-inside: avoid; padding-top: 36px; padding-bottom: 36px; }
+.bsc-g-shead, .bsc-g-logos, .bsc-g-swatches, .bsc-g-rules-grid, .bsc-g-cols, .bsc-g-apps { break-inside: avoid; }
+.bsc-g-table tr { break-inside: avoid; }
+.bsc-g-img-grid img, .bsc-g-app img { max-height: 230px; object-fit: cover; }
+.bsc-g-back { page-break-before: always; min-height: 90vh; }
+a { text-decoration: none; color: inherit; }
