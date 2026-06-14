@@ -86,7 +86,8 @@
 		this.canvas.setAttribute('aria-hidden', 'true');
 		this.ctx = this.canvas.getContext('2d');
 		this.rect = { left: 0, top: 0, width: 0, height: 0 };
-		this.dpr = Math.min(window.devicePixelRatio || 1, this.cfg.maxDpr || 0.65);
+		var defaultDpr = packId === 'awenaurora' ? 0.45 : 0.65;
+		this.dpr = Math.min(window.devicePixelRatio || 1, this.cfg.maxDpr || defaultDpr);
 		this.inited = false;
 		this.lastRender = 0;
 		this.frameInterval = 1 / (this.cfg.fps || 18);

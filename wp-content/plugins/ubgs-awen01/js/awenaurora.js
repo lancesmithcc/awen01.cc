@@ -8,9 +8,9 @@
 		name: 'AWEN01 Smooth Aurora',
 
 		init: function (state, f) {
-			var density = Math.min(f.density, 0.85);
+			var density = Math.min(f.density, 0.82);
 			state.ribbonCount = Math.max(3, Math.round(4 * density));
-			state.samples = Math.max(26, Math.round(42 * density));
+			state.samples = Math.max(22, Math.round(34 * density));
 			state.loopSeconds = 36;
 			state.react = 0;
 			state.sway = 0;
@@ -21,7 +21,7 @@
 				state.ribbons.push({
 					seed: seed,
 					offset: U.noise2(seed, i + 5.1) * Math.PI * 2,
-					spread: 0.78 + U.noise2(seed, 11.3) * 0.55,
+					spread: 1.15 + U.noise2(seed, 11.3) * 0.7,
 					tilt: -0.08 + U.noise2(seed, 21.9) * 0.16,
 					waves: [
 						{ amp: 0.52, freq: 1 + (i % 3), phase: U.noise2(seed, 31.7) * Math.PI * 2 },
@@ -45,12 +45,12 @@
 			var pointerX = U.clamp(f.pointer.x / Math.max(1, f.w), 0, 1);
 			var pointerY = U.clamp(f.pointer.y / Math.max(1, f.h), 0, 1);
 			var targetReact = f.pointer.active ? 1 : 0;
-			var targetSway = f.pointer.active ? (pointerX - 0.5) * 0.36 : 0;
-			var targetLift = f.pointer.active ? (1 - pointerY) * 0.32 : 0;
-			state.react = U.lerp(state.react || 0, targetReact, ease * 0.55);
-			state.sway = U.lerp(state.sway || 0, targetSway, ease * 0.5);
-			state.lift = U.lerp(state.lift || 0, targetLift, ease * 0.45);
-			var hover = 1 + state.react * 0.42;
+			var targetSway = f.pointer.active ? (pointerX - 0.5) * 0.58 : 0;
+			var targetLift = f.pointer.active ? (1 - pointerY) * 0.52 : 0;
+			state.react = U.lerp(state.react || 0, targetReact, ease * 0.72);
+			state.sway = U.lerp(state.sway || 0, targetSway, ease * 0.62);
+			state.lift = U.lerp(state.lift || 0, targetLift, ease * 0.56);
+			var hover = 1 + state.react * 0.72;
 			var sky = ctx.createLinearGradient(0, 0, 0, f.h);
 			sky.addColorStop(0, U.rgba(colors[1 % colors.length], 0.045 * hover));
 			sky.addColorStop(0.38, U.rgba(colors[0], 0.025 * hover));
@@ -66,15 +66,15 @@
 				var ribbon = state.ribbons[r];
 				var color = colors[r % colors.length];
 				var yBase = f.h * (0.14 + r * 0.11 + Math.sin(theta * (1 + (r % 2)) + ribbon.offset) * 0.018);
-				var amp = f.h * (0.105 + r * 0.014) * ribbon.spread;
-				var depth = f.h * (0.24 + r * 0.03 + state.lift * 0.16);
-				var alpha = (0.075 + r * 0.016 + state.lift * 0.1) * (f.opacity || 0.85);
+				var amp = f.h * (0.125 + r * 0.018) * ribbon.spread;
+				var depth = f.h * (0.34 + r * 0.044 + state.lift * 0.18);
+				var alpha = (0.068 + r * 0.014 + state.lift * 0.08) * (f.opacity || 0.85);
 
 				var grad = ctx.createLinearGradient(0, yBase - depth * 0.4, 0, yBase + depth);
 				grad.addColorStop(0, U.rgba(color, 0));
-				grad.addColorStop(0.28, U.rgba(color, alpha * 0.68 * hover));
-				grad.addColorStop(0.5, U.rgba(color, alpha * 2.1 * hover));
-				grad.addColorStop(0.68, U.rgba(color, alpha * 0.9 * hover));
+				grad.addColorStop(0.22, U.rgba(color, alpha * 0.5 * hover));
+				grad.addColorStop(0.5, U.rgba(color, alpha * 1.58 * hover));
+				grad.addColorStop(0.76, U.rgba(color, alpha * 0.58 * hover));
 				grad.addColorStop(1, U.rgba(color, 0));
 				ctx.fillStyle = grad;
 
@@ -87,9 +87,14 @@
 						var w = ribbon.waves[wi];
 						wave += Math.sin(nx * Math.PI * 2 * w.freq + theta * (wi + 1) + w.phase) * w.amp;
 					}
+					var influence = state.react * U.smoothstep(0.58, 0, Math.abs(nx - pointerX));
+					var hoverBend = Math.sin((nx - pointerX) * Math.PI * 2 + theta * 1.4 + ribbon.offset) * amp * 0.34 * influence;
+					var hoverLift = (0.5 - pointerY) * f.h * 0.22 * influence;
 					var y = yBase
 						+ wave * amp * 0.54
 						+ Math.sin(nx * Math.PI * 2 + theta * 2 + ribbon.offset) * amp * 0.14
+						+ hoverBend
+						+ hoverLift
 						+ state.sway * (nx - 0.5) * f.h
 						+ ribbon.tilt * (nx - 0.5) * f.h;
 					if (i === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
@@ -98,8 +103,10 @@
 					var bx = (j / state.samples) * f.w;
 					var bnx = j / state.samples;
 					var lower = 0.5 + Math.sin(bnx * Math.PI * 4 + theta * 2 + ribbon.offset) * 0.08;
+					var lowerInfluence = state.react * U.smoothstep(0.64, 0, Math.abs(bnx - pointerX));
 					var by = yBase + depth * lower
 						+ Math.sin(bnx * Math.PI * 2 + theta + r) * amp * 0.12
+						+ (0.5 - pointerY) * f.h * 0.14 * lowerInfluence
 						+ state.sway * (bnx - 0.5) * f.h
 						+ ribbon.tilt * (bnx - 0.5) * f.h;
 					ctx.lineTo(bx, by);
@@ -111,10 +118,11 @@
 			ctx.filter = 'none';
 			for (var g = 0; g < 3; g++) {
 				var c = colors[(g + 1) % colors.length];
-				var gx = f.w * (0.18 + g * 0.29 + Math.sin(theta * (g + 1) + g) * 0.025);
-				var gy = f.h * (0.17 + Math.cos(theta * (g + 2) + g) * 0.045);
-				var glow = ctx.createRadialGradient(gx, gy, 0, gx, gy + f.h * 0.04, f.w * 0.34);
-				glow.addColorStop(0, U.rgba(c, 0.055 * hover));
+				var pull = state.react * (g === 1 ? 0.18 : 0.1);
+				var gx = f.w * (0.18 + g * 0.29 + Math.sin(theta * (g + 1) + g) * 0.025 + (pointerX - 0.5) * pull);
+				var gy = f.h * (0.17 + Math.cos(theta * (g + 2) + g) * 0.045 + (pointerY - 0.5) * pull);
+				var glow = ctx.createRadialGradient(gx, gy, 0, gx, gy + f.h * 0.04, f.w * (0.36 + state.react * 0.06));
+				glow.addColorStop(0, U.rgba(c, 0.072 * hover));
 				glow.addColorStop(1, U.rgba(c, 0));
 				ctx.fillStyle = glow;
 				ctx.fillRect(0, 0, f.w, f.h);

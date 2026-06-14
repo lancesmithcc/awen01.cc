@@ -95,6 +95,22 @@ if ( class_exists( 'BSC_Brand' ) ) {
 	WP_CLI::warning( 'Brand Standards Creator classes were unavailable. Stored bsc_brand option only.' );
 }
 
+update_option(
+	'ultrabgs_settings',
+	array(
+		'enabled' => 0,
+		'pack'    => 'awenaurora',
+		'color1'  => '#050b0a',
+		'color2'  => '#36d6c7',
+		'color3'  => '#a98bff',
+		'opacity' => 0.65,
+		'speed'   => 0.7,
+		'density' => 0.75,
+		'zindex'  => -1,
+	),
+	false
+);
+
 $home_content = file_exists( $home_file ) ? file_get_contents( $home_file ) : '';
 if ( $home_content ) {
 	$home = get_page_by_path( 'home' );

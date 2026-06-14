@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const AWEN01_CHILD_VERSION = '0.1.5';
+const AWEN01_CHILD_VERSION = '0.1.8';
 
 add_action( 'wp_enqueue_scripts', 'awen01_child_enqueue_assets', 20 );
 add_action( 'enqueue_block_editor_assets', 'awen01_child_enqueue_assets', 20 );
@@ -148,13 +148,13 @@ function awen01_child_motion_standards_section() {
 		'density' => 0.74,
 		'zIndex'  => 0,
 		'fps'     => 18,
-		'maxDpr'  => 0.65,
+		'maxDpr'  => 0.45,
 	) );
 	$node_config = awen01_child_ultrabgs_config_attr( array(
 		'colors'  => array( '#36d6c7', '#a98bff', '#6b9cff' ),
 		'opacity' => 0.76,
 		'speed'   => 0.5,
-		'density' => 0.62,
+		'density' => 0.86,
 		'zIndex'  => 1,
 		'fps'     => 18,
 		'maxDpr'  => 0.65,
@@ -235,9 +235,9 @@ function awen01_child_register_patterns() {
 	register_block_pattern_category( 'awen01', array( 'label' => __( 'AWEN01', 'awen01' ) ) );
 
 	$pattern = <<<'HTML'
-<!-- wp:generateblocks/element {"uniqueId":"motf001","className":"gb-element-motf001 gb-element alignfull awen-motif-field awen-aurora awen-node-matrix","tagName":"section","align":"full","ultrabgsEnabled":true,"ultrabgsPack":"awenaurora","ultrabgsColors":["#08110f","#36d6c7","#a98bff"],"ultrabgsOpacity":0.86,"ultrabgsSpeed":0.65,"ultrabgsDensity":1.15,"ultrabgsZIndex":0,"htmlAttributes":{"data-ultrabgs":"awenaurora","data-ubgs-config":"{\"colors\":[\"#08110f\",\"#36d6c7\",\"#a98bff\"],\"opacity\":0.86,\"speed\":0.65,\"density\":1.15,\"zIndex\":0}"},"styles":{"backgroundColor":"var(--bsc-color-labradorite-ink)","overflow":"hidden","padding":"6rem 1.5rem","position":"relative"},"css":".gb-element-motf001{background-color:var(--bsc-color-labradorite-ink);overflow:hidden;padding:6rem 1.5rem;position:relative}@media(max-width:768px){.gb-element-motf001{padding:4rem 1.25rem}}"} -->
+<!-- wp:generateblocks/element {"uniqueId":"motf001","className":"gb-element-motf001 gb-element alignfull awen-motif-field awen-aurora awen-node-matrix","tagName":"section","align":"full","ultrabgsEnabled":true,"ultrabgsPack":"awenaurora","ultrabgsColors":["#08110f","#36d6c7","#a98bff"],"ultrabgsOpacity":0.86,"ultrabgsSpeed":0.65,"ultrabgsDensity":1.15,"ultrabgsZIndex":0,"htmlAttributes":{"data-ultrabgs":"awenaurora","data-ubgs-config":"{\"colors\":[\"#08110f\",\"#36d6c7\",\"#a98bff\"],\"opacity\":0.86,\"speed\":0.65,\"density\":1.15,\"zIndex\":0}"},"styles":{"backgroundColor":"var(--bsc-color-labradorite-ink)","overflow":"visible","padding":"6rem 1.5rem","position":"relative"},"css":".gb-element-motf001{background-color:var(--bsc-color-labradorite-ink);overflow:visible;padding:6rem 1.5rem;position:relative}@media(max-width:768px){.gb-element-motf001{padding:4rem 1.25rem}}"} -->
 <section class="gb-element-motf001 gb-element alignfull awen-motif-field awen-aurora awen-node-matrix" data-ultrabgs="awenaurora" data-ubgs-config='{"colors":["#08110f","#36d6c7","#a98bff"],"opacity":0.86,"speed":0.65,"density":1.15,"zIndex":0}'>
-<!-- wp:generateblocks/element {"uniqueId":"motf006","className":"gb-element-motf006 gb-element awen-ultrabgs-overlay","tagName":"div","ultrabgsEnabled":true,"ultrabgsPack":"awennodes","ultrabgsColors":["#36d6c7","#a98bff","#6b9cff"],"ultrabgsOpacity":0.76,"ultrabgsSpeed":0.5,"ultrabgsDensity":1.05,"ultrabgsZIndex":1,"htmlAttributes":{"aria-hidden":"true","data-ultrabgs":"awennodes","data-ubgs-config":"{\"colors\":[\"#36d6c7\",\"#a98bff\",\"#6b9cff\"],\"opacity\":0.76,\"speed\":0.5,\"density\":1.05,\"zIndex\":1}"},"styles":{"inset":"0","overflow":"hidden","pointerEvents":"none","position":"absolute","zIndex":"1"},"css":".gb-element-motf006{inset:0;overflow:hidden;pointer-events:none;position:absolute;z-index:1}"} -->
+<!-- wp:generateblocks/element {"uniqueId":"motf006","className":"gb-element-motf006 gb-element awen-ultrabgs-overlay","tagName":"div","ultrabgsEnabled":true,"ultrabgsPack":"awennodes","ultrabgsColors":["#36d6c7","#a98bff","#6b9cff"],"ultrabgsOpacity":0.76,"ultrabgsSpeed":0.5,"ultrabgsDensity":1.05,"ultrabgsZIndex":1,"htmlAttributes":{"aria-hidden":"true","data-ultrabgs":"awennodes","data-ubgs-config":"{\"colors\":[\"#36d6c7\",\"#a98bff\",\"#6b9cff\"],\"opacity\":0.76,\"speed\":0.5,\"density\":1.05,\"zIndex\":1}"},"styles":{"inset":"-12% -9%","overflow":"visible","pointerEvents":"none","position":"absolute","zIndex":"1"},"css":".gb-element-motf006{inset:-12% -9%;overflow:visible;pointer-events:none;position:absolute;z-index:1}"} -->
 <div class="gb-element-motf006 gb-element awen-ultrabgs-overlay" aria-hidden="true" data-ultrabgs="awennodes" data-ubgs-config='{"colors":["#36d6c7","#a98bff","#6b9cff"],"opacity":0.76,"speed":0.5,"density":1.05,"zIndex":1}'></div>
 <!-- /wp:generateblocks/element -->
 <!-- wp:generateblocks/element {"uniqueId":"motf007","className":"gb-element-motf007 gb-element awen-ultrabgs-shade","tagName":"div","htmlAttributes":{"aria-hidden":"true"},"styles":{"inset":"0","pointerEvents":"none","position":"absolute","zIndex":"2"},"css":".gb-element-motf007{inset:0;pointer-events:none;position:absolute;z-index:2}"} -->

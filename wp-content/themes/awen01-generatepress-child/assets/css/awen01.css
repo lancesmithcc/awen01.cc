@@ -8,6 +8,7 @@ body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var
 .awen01-brand .site.grid-container,.awen01-brand .site-content,.awen01-brand .content-area,.awen01-brand .site-main,.awen01-brand .inside-article{box-sizing:border-box;margin-left:0;margin-right:0;max-width:none!important;padding-left:0!important;padding-right:0!important;width:100%!important}
 .awen-global-bg{inset:0;overflow:hidden;pointer-events:none;position:fixed;z-index:0}
 .awen-global-bg--aurora{mix-blend-mode:screen;opacity:.78}
+.awen-global-bg--aurora>.ultrabgs-canvas,.awen-aurora>.ultrabgs-canvas{filter:blur(18px) saturate(1.28);transform:scale(1.045);transform-origin:center;will-change:filter,transform}
 .awen-global-bg--nodes{mix-blend-mode:screen;opacity:.86}
 .awen01-brand .site,.awen01-brand .site-header,.awen01-brand .site-footer{position:relative;z-index:2}
 .awen01-brand h1,.awen01-brand h2,.awen01-brand h3,.awen01-brand h4,.awen01-brand .main-title{font-family:var(--bsc-font-family-heading,"Jost",system-ui,sans-serif);font-weight:700;letter-spacing:-.02em}
@@ -32,7 +33,9 @@ body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var
 .awen-mode-transcendent{--awen-bg:var(--bsc-color-threshold-grey,#8f9496);--awen-fg:var(--bsc-color-labradorite-ink,#08110f);--awen-muted:var(--bsc-color-ink-text,#1d2527);--awen-accent:var(--bsc-color-muted-labradorite,#4f7c72);--awen-panel:var(--bsc-color-muted-lavender,#aaa0c4)}
 .awen-aurora,.awen-node-matrix{isolation:isolate;position:relative}
 .awen-aurora>.ultrabgs-canvas{mix-blend-mode:screen}
-.awen-ultrabgs-overlay{inset:0;overflow:hidden;pointer-events:none;position:absolute;z-index:1}
+.awen-node-matrix{overflow:visible!important}
+.awen-node-matrix .awen-ultrabgs-overlay{inset:-12% -9%!important;overflow:visible!important}
+.awen-ultrabgs-overlay{inset:-12% -9%;overflow:visible;pointer-events:none;position:absolute;z-index:1}
 .awen-ultrabgs-overlay>.ultrabgs-canvas{mix-blend-mode:screen}
 .awen-ultrabgs-shade{background:linear-gradient(100deg,rgba(8,17,15,.94) 0%,rgba(8,17,15,.76) 48%,rgba(8,17,15,.42) 100%);inset:0;pointer-events:none;position:absolute;z-index:2}
 .awen-motif-field>:not(.ultrabgs-canvas):not(.awen-ultrabgs-overlay):not(.awen-ultrabgs-shade),.awen-aurora>:not(.ultrabgs-canvas):not(.awen-ultrabgs-overlay):not(.awen-ultrabgs-shade){position:relative;z-index:3}

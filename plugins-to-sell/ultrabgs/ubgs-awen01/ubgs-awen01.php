@@ -3,7 +3,7 @@
  * Plugin Name: UltraBGs Pack — AWEN01
  * Plugin URI:  https://awen01.cc
  * Description: AWEN01-specific UltraBGs packs: smooth aurora borealis and linework node constellations.
- * Version:     1.0.3
+ * Version:     1.0.6
  * Author:      AWEN01
  * Author URI:  https://awen01.cc
  * License:     GPL-2.0-or-later
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'UBGS_AWEN01_VERSION', '1.0.3' );
+define( 'UBGS_AWEN01_VERSION', '1.0.6' );
 
 add_filter( 'ultrabgs_packs', function ( $packs ) {
 	$base = plugins_url( 'js/', __FILE__ );
