@@ -268,6 +268,11 @@ class Stockboss_OpenRouter
 
     private function attachment_to_data_url(int $attachment_id): ?string
     {
+        // Only allow reference images the current user is permitted to read.
+        if (get_post_type($attachment_id) !== 'attachment' || ! current_user_can('read_post', $attachment_id)) {
+            return null;
+        }
+
         $file_path = get_attached_file($attachment_id);
 
         if (! $file_path || ! file_exists($file_path)) {
@@ -449,6 +454,55 @@ class Stockboss_OpenRouter
         ];
     }
 
+    /**
+     * Guard download_url() against SSRF: require https and reject any host that
+     * resolves to a private, loopback, or link-local address.
+     */
+    private function is_safe_remote_url(string $url): bool
+    {
+        $parts = wp_parse_url($url);
+        if (! is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
+            return false;
+        }
+        if (strtolower($parts['scheme']) !== 'https') {
+            return false;
+        }
+
+        $host = $parts['host'];
+        $ips  = [];
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips[] = $host;
+        } else {
+            $records = @dns_get_record($host, DNS_A + DNS_AAAA);
+            if (is_array($records)) {
+                foreach ($records as $r) {
+                    if (! empty($r['ip'])) {
+                        $ips[] = $r['ip'];
+                    }
+                    if (! empty($r['ipv6'])) {
+                        $ips[] = $r['ipv6'];
+                    }
+                }
+            }
+            // If DNS resolution failed, refuse rather than trust an unknown host.
+            if (empty($ips)) {
+                return false;
+            }
+        }
+
+        foreach ($ips as $ip) {
+            if (! filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            )) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function extract_openrouter_error_message(array $decoded, int $status_code): string
     {
         $message = sprintf(
@@ -530,6 +584,9 @@ class Stockboss_OpenRouter
         $temp_file = null;
 
         if ($image_payload['type'] === 'url') {
+            if (! $this->is_safe_remote_url((string) $image_payload['data'])) {
+                return new WP_Error('stockboss_unsafe_url', __('Generated image URL is not allowed.', 'stockboss'), ['status' => 400]);
+            }
             $temp_file = download_url($image_payload['data']);
             if (is_wp_error($temp_file)) {
                 return new WP_Error('stockboss_download_error', $temp_file->get_error_message(), ['status' => 500]);

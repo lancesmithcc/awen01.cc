@@ -53,6 +53,22 @@ class Stockboss_Rest
 
     public function generate_image(WP_REST_Request $request)
     {
+        // Throttle paid AI generations per user to limit cost abuse.
+        $limit = (int) apply_filters('stockboss_generations_per_hour', 60);
+        if ($limit > 0) {
+            $user_id = get_current_user_id();
+            $key     = 'stockboss_rl_' . $user_id;
+            $count   = (int) get_transient($key);
+            if ($count >= $limit) {
+                return new WP_Error(
+                    'stockboss_rate_limited',
+                    sprintf(__('Generation limit reached (%d/hour). Try again later.', 'stockboss'), $limit),
+                    ['status' => 429]
+                );
+            }
+            set_transient($key, $count + 1, HOUR_IN_SECONDS);
+        }
+
         $result = $this->openrouter->generate_and_store([
             'prompt' => $request->get_param('prompt'),
             'useCustomSystemPrompt' => (bool) $request->get_param('useCustomSystemPrompt'),

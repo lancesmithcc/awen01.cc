@@ -132,7 +132,11 @@ class BSC_Rest {
 		$text = $json['choices'][0]['message']['content'] ?? null;
 
 		if ( null === $text ) {
-			return new WP_Error( 'bsc_ai', 'Provider returned no content.', array( 'status' => 502, 'detail' => $json ) );
+			$err = array( 'status' => 502 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$err['detail'] = $json;
+			}
+			return new WP_Error( 'bsc_ai', 'Provider returned no content.', $err );
 		}
 		return rest_ensure_response( array( 'text' => $text ) );
 	}
@@ -154,6 +158,12 @@ class BSC_Rest {
 		$model  = sanitize_text_field( $req->get_param( 'model' ) ?: (
 			'vector' === $kind ? $brand['ai']['fal_vector_model'] : $brand['ai']['fal_raster_model']
 		) );
+		// Harden against host-override / SSRF: $model is concatenated into the
+		// fal.run request URL, so reject anything that could escape the path
+		// (userinfo '@', scheme ':', whitespace, traversal '..').
+		if ( ! preg_match( '#^[a-z0-9][a-z0-9._/-]*$#i', $model ) || false !== strpos( $model, '..' ) ) {
+			return new WP_Error( 'bsc_bad_model', 'Invalid model identifier.', array( 'status' => 400 ) );
+		}
 		$prompt = (string) $req->get_param( 'prompt' );
 
 		$input = array( 'prompt' => $prompt );
@@ -183,7 +193,11 @@ class BSC_Rest {
 		$url  = $json['images'][0]['url'] ?? ( $json['image']['url'] ?? null );
 
 		if ( ! $url ) {
-			return new WP_Error( 'bsc_fal', 'fal.ai returned no image.', array( 'status' => 502, 'detail' => $json ) );
+			$err = array( 'status' => 502 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$err['detail'] = $json;
+			}
+			return new WP_Error( 'bsc_fal', 'fal.ai returned no image.', $err );
 		}
 
 		// Sideload into Media Library.

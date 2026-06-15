@@ -172,11 +172,26 @@ class Stockboss_Options
             }
 
             if ($submitted !== '') {
-                $output[$secret_key] = $this->encrypt_secret(sanitize_text_field($submitted));
+                $encrypted = $this->encrypt_secret(sanitize_text_field($submitted));
+                if ($encrypted === '') {
+                    // Encryption unavailable — refuse to store plaintext, keep prior value.
+                    add_settings_error(
+                        self::OPTION_KEY,
+                        'stockboss_encrypt_failed',
+                        __('Could not securely encrypt the API key (OpenSSL unavailable). Key was not saved.', 'stockboss'),
+                        'error'
+                    );
+                } else {
+                    $output[$secret_key] = $encrypted;
+                }
             }
 
             if (! empty($output[$secret_key]) && strpos((string) $output[$secret_key], self::SECRET_PREFIX) !== 0) {
-                $output[$secret_key] = $this->encrypt_secret($this->decrypt_secret((string) $output[$secret_key]));
+                $reencrypted = $this->encrypt_secret($this->decrypt_secret((string) $output[$secret_key]));
+                // Only replace legacy plaintext when re-encryption succeeds.
+                if ($reencrypted !== '') {
+                    $output[$secret_key] = $reencrypted;
+                }
             }
         }
 
@@ -427,19 +442,22 @@ CSS;
             return '';
         }
 
+        // Fail closed: never persist the secret as plaintext. If encryption is
+        // unavailable, return '' so the caller refuses the save instead of
+        // writing an unencrypted API key to wp_options.
         if (! function_exists('openssl_encrypt') || ! function_exists('openssl_random_pseudo_bytes')) {
-            return $secret;
+            return '';
         }
 
         $iv = openssl_random_pseudo_bytes(16);
         if ($iv === false || strlen($iv) !== 16) {
-            return $secret;
+            return '';
         }
 
         $key = hash('sha256', wp_salt('auth'), true);
         $ciphertext = openssl_encrypt($secret, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
         if ($ciphertext === false) {
-            return $secret;
+            return '';
         }
 
         $mac = hash_hmac('sha256', $iv . $ciphertext, $key, true);
