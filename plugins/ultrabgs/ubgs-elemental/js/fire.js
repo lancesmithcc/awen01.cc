@@ -37,14 +37,12 @@
 			var t = f.t * f.speed;
 			var gw = state.gw, gh = state.gh, heat = state.heat, flow = state.flow;
 
-			// --- Seed flickering fuel along the base (scroll raises it) ---
-			var fuelRow = gh - 1 - (Math.max(0, Math.round(f.scroll * 0.02)) % ((gh / 2) | 0 || 1));
+			// --- Seed flickering fuel: a SINGLE line pinned to the base ---
+			var fuelRow = gh - 1;
 			for (var x = 0; x < gw; x++) {
-				// Layered flicker: broad gusts + fine sputter for a live base.
-				var flick = U.noise2(x * 0.12, t * 3) * 0.5 + U.noise2(x * 0.5, t * 9) * 0.3 + 0.3;
-				var i0 = fuelRow * gw + x;
-				heat[i0] = Math.min(1.2, flick);
-				if (fuelRow + 1 < gh) { heat[(fuelRow + 1) * gw + x] = Math.min(1.2, flick * 1.05); }
+				// Layered flicker + high-frequency spike term for sharp tongues.
+				var flick = U.noise2(x * 0.12, t * 3) * 0.45 + U.noise2(x * 0.5, t * 9) * 0.3 + U.noise2(x * 1.3, t * 16) * 0.3 + 0.3;
+				heat[fuelRow * gw + x] = Math.min(1.4, flick * 1.15);
 			}
 
 			// --- Disturbance: pointer motion feeds a horizontal shear flow.
@@ -110,8 +108,8 @@
 					var r1 = heat[rowBelow + ((x2 + 1) % gw)];
 					var l2 = heat[rowBelow + ((x2 - 2 + gw) % gw)];
 					var r2 = heat[rowBelow + ((x2 + 2) % gw)];
-					var below = center * 0.5 + (l1 + r1) * 0.17 + (l2 + r2) * 0.08;
-					var decay = 0.010 + Math.random() * 0.045;
+					var below = center * 0.78 + (l1 + r1) * 0.095 + (l2 + r2) * 0.015;
+					var decay = 0.006 + Math.random() * 0.026;
 					heat2[y * gw + x2] = Math.max(0, below - decay);
 				}
 			}

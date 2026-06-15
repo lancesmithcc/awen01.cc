@@ -36,7 +36,7 @@ body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var
 @keyframes awen-logo-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 /* Logo link — spin on hover, coast-to-stop off */
 .custom-logo-link{display:inline-block;transition:transform 1.3s cubic-bezier(.16,1,.3,1)}
-.custom-logo-link:hover{animation:awen-logo-spin 2.5s linear infinite}
+.custom-logo-link:hover{animation:awen-logo-spin 0.7s linear infinite}
 .custom-logo-link:hover .custom-logo{animation:awen-logo-breathe-deep 13s ease-in-out infinite}
 .awen01-brand .main-title{font-size:1.15rem;line-height:1;white-space:nowrap;width:auto!important}
 .awen01-brand .site-description{color:rgba(247,248,251,.68);font-size:0.8125rem;line-height:1.2;margin-top:0.25rem}
@@ -93,6 +93,22 @@ body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var
 .ubgs-pack-demo__meta p{color:var(--bsc-color-aurora-teal,#36d6c7);font-size:.8125rem;font-weight:700;letter-spacing:.14em;margin:0 0 .75rem;text-transform:uppercase}
 .ubgs-pack-demo__meta h3{color:var(--bsc-color-moon-white,#f7f8fb);font-size:clamp(1.5rem,3vw,2.25rem);line-height:1.12;margin:0 0 .75rem}
 .ubgs-pack-demo__meta span{color:rgba(247,248,251,.74);display:block;font-size:1rem;line-height:1.7;max-width:620px}
+/* ── UltraBGs effect sampler — large 2-up tiles, padded ── */
+#motion-gallery .gb-element[data-ultrabgs],.ubgs-tile{position:relative;overflow:hidden;box-sizing:border-box;border-radius:14px;min-height:400px;padding:2rem;display:flex;flex-direction:column;justify-content:flex-end;background:var(--bsc-color-labradorite-ink,#08110f);border:1px solid rgba(247,248,251,.12);box-shadow:0 18px 50px rgba(8,17,15,.24)}
+#motion-gallery .gb-element[data-ultrabgs] canvas,#motion-gallery .gb-element[data-ultrabgs] .ultrabgs-canvas,.ubgs-tile canvas,.ubgs-tile .ultrabgs-canvas{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0}
+#motion-gallery .gb-element[data-ultrabgs]>*,.ubgs-tile>*{position:relative;z-index:2}
+.ubgs-tile__name{color:var(--bsc-color-moon-white,#f7f8fb);font-size:1.25rem;font-weight:700;margin:0;text-shadow:0 2px 14px rgba(8,17,15,.7)}
+/* Click-to-activate stills (defer heavy canvases until clicked) */
+.ubgs-still{cursor:pointer}
+.ubgs-still::after{content:"\25B6  Play effect";position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;color:var(--bsc-color-moon-white,#f7f8fb);font-size:0.95rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 14px rgba(8,17,15,.8);background:radial-gradient(circle at 50% 44%,rgba(8,17,15,.46),rgba(8,17,15,.16));transition:background .3s ease}
+.ubgs-still:hover::after{background:radial-gradient(circle at 50% 44%,rgba(8,17,15,.6),rgba(8,17,15,.28))}
+.ubgs-playing{cursor:default}
+.ubgs-sampler-grid{display:grid;gap:1.75rem;grid-template-columns:repeat(2,minmax(0,1fr))}
+.ubgs-pack-group{margin-top:3.5rem}
+.ubgs-pack-group__name{color:var(--awen-fg,#f7f8fb);font-size:clamp(1.5rem,2.4vw,2rem);font-weight:700;margin:0 0 .5rem}
+.ubgs-pack-group__desc{color:color-mix(in srgb,var(--awen-fg,#f7f8fb) 78%,transparent);font-size:1rem;font-weight:300;line-height:1.6;margin:0 0 1.75rem;max-width:640px}
+@media(max-width:860px){.ubgs-sampler-grid{grid-template-columns:1fr}}
+@media(max-width:768px){#motion-gallery .gb-element[data-ultrabgs],.ubgs-tile{min-height:300px;padding:1.5rem}}
 .awen-swatch-card{box-shadow:0 20px 60px rgba(8,17,15,.12);position:relative}
 .awen-swatch-card::after{background:linear-gradient(135deg,rgba(255,255,255,.42),transparent 42%,rgba(54,214,199,.22));border-radius:inherit;content:"";inset:0;position:absolute}
 .awen01-brand .bsc-guide{--g-ink:var(--awen-fg)!important;--g-paper:transparent!important;--g-accent:var(--awen-accent)!important;background:transparent!important;color:var(--awen-fg)}

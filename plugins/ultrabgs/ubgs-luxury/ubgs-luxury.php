@@ -14,21 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'UBGS_LUX_VERSION', '1.0.0' );
+define( 'UBGS_LUX_VERSION', '1.2.0' );
 
 add_filter( 'ultrabgs_packs', function ( $packs ) {
 	$base = plugins_url( 'js/', __FILE__ );
 	$defs = array(
 		'silk'      => __( 'Flowing Silk', 'ubgs-luxury' ),
-		'liquidgold'=> __( 'Liquid Gold', 'ubgs-luxury' ),
 		'marble'    => __( 'Marble Veins', 'ubgs-luxury' ),
-		'diamond'   => __( 'Diamond Refractions', 'ubgs-luxury' ),
 		'velvet'    => __( 'Velvet Waves', 'ubgs-luxury' ),
-		'champagne' => __( 'Champagne Bubbles', 'ubgs-luxury' ),
 		'brushed'   => __( 'Brushed Metal', 'ubgs-luxury' ),
 		'luxsmoke'  => __( 'Luxury Smoke', 'ubgs-luxury' ),
-		'pearl'     => __( 'Pearl Reflections', 'ubgs-luxury' ),
-		'crystal'   => __( 'Crystal Prisms', 'ubgs-luxury' ),
 	);
 	foreach ( $defs as $id => $label ) {
 		$packs[ $id ] = array(

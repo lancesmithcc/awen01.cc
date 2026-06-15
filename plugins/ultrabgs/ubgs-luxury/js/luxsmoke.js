@@ -14,16 +14,24 @@
 		name: 'Luxury Smoke',
 
 		init: function (state, f) {
-			var n = Math.round(20 * f.density);
+			var M = Math.max(f.w, f.h);
 			var puffs = [];
-			for (var i = 0; i < n; i++) {
+			// Large sculptural plumes.
+			var big = Math.round(16 * f.density);
+			for (var i = 0; i < big; i++) {
 				puffs.push({
-					x: Math.random() * f.w,
-					y: Math.random() * f.h,
-					vx: 0, vy: 0,
-					r: (0.12 + Math.random() * 0.18) * Math.max(f.w, f.h),
-					seed: Math.random() * 100,
-					ci: i % 3
+					x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0,
+					r: (0.13 + Math.random() * 0.18) * M,
+					seed: Math.random() * 100, ci: i % 3, fine: 0.1, op: 1
+				});
+			}
+			// Fine detail wisps — smaller, more numerous, faster turbulence.
+			var small = Math.round(42 * f.density);
+			for (var j = 0; j < small; j++) {
+				puffs.push({
+					x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0,
+					r: (0.035 + Math.random() * 0.065) * M,
+					seed: Math.random() * 100, ci: j % 3, fine: 0.4, op: 0.72
 				});
 			}
 			state.puffs = puffs;
@@ -37,8 +45,9 @@
 			ctx.globalCompositeOperation = 'lighter';
 			for (var i = 0; i < puffs.length; i++) {
 				var p = puffs[i];
-				var ax = (U.noise2(p.seed, t * 0.1) - 0.5) * 8;
-				var ay = (U.noise2(t * 0.1, p.seed) - 0.5) * 6 + lift;
+				var ff = p.fine || 0.1;
+				var ax = (U.noise2(p.seed, t * ff) - 0.5) * 8;
+				var ay = (U.noise2(t * ff, p.seed) - 0.5) * 6 + lift;
 
 				if (f.pointer.active) {
 					var dx = p.x - f.pointer.x, dy = p.y - f.pointer.y;
@@ -65,8 +74,9 @@
 				var breathe = 0.85 + 0.15 * Math.sin(t * 0.5 + p.seed);
 				var rr = p.r * breathe;
 				var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rr);
-				g.addColorStop(0, U.rgba(col, 0.10));
-				g.addColorStop(0.5, U.rgba(col, 0.045));
+				var op = p.op || 1;
+				g.addColorStop(0, U.rgba(col, 0.11 * op));
+				g.addColorStop(0.5, U.rgba(col, 0.05 * op));
 				g.addColorStop(1, U.rgba(col, 0));
 				ctx.fillStyle = g;
 				ctx.beginPath();

@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const AWEN01_CHILD_VERSION = '0.6.9';
+const AWEN01_CHILD_VERSION = '0.6.7';
 
 add_action( 'wp_enqueue_scripts', 'awen01_child_enqueue_assets', 20 );
 add_filter( 'block_editor_settings_all', 'awen01_child_add_editor_canvas_styles' );

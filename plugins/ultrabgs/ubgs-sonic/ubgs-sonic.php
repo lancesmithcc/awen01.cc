@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'UBGS_SONIC_VERSION', '1.1.0' );
+define( 'UBGS_SONIC_VERSION', '1.2.0' );
 
 add_filter( 'ultrabgs_packs', function ( $packs ) {
 	$base = plugins_url( 'js/', __FILE__ );
@@ -23,8 +23,6 @@ add_filter( 'ultrabgs_packs', function ( $packs ) {
 		'spectrum'   => __( 'Spectrum Bars', 'ubgs-sonic' ),
 		'guitar'     => __( 'Guitar Strings', 'ubgs-sonic' ),
 		'harp'       => __( 'Harp Strings', 'ubgs-sonic' ),
-		'cymaticplate'=> __( 'Cymatic Plate', 'ubgs-sonic' ),
-		'cymaticrings'=> __( 'Cymatic Rings', 'ubgs-sonic' ),
 	);
 	foreach ( $defs as $id => $label ) {
 		$packs[ $id ] = array(
