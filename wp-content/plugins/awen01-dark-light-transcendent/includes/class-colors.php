@@ -72,13 +72,16 @@ class AWEN_DLT_Colors {
 			return $overrides[ $slug ];
 		}
 
+		// Light mode mirrors the main GenerateBlocks / brand color definition.
+		// It is the baseline the other two modes diverge from, so it must never
+		// fall through to a separate default scheme.
+		if ( 'light' === $mode ) {
+			return $light_hex;
+		}
+
 		$defaults = self::default_schemes();
 		if ( ! empty( $defaults[ $mode ][ $slug ] ) ) {
 			return $defaults[ $mode ][ $slug ];
-		}
-
-		if ( 'light' === $mode ) {
-			return $light_hex;
 		}
 
 		if ( 'transcendent' === $mode ) {

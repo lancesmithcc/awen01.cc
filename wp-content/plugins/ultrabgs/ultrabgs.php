@@ -3,7 +3,7 @@
  * Plugin Name:       UltraBGs
  * Plugin URI:        https://awen01.cc
  * Description:       Motion, hover, scroll and tap responsive animated background layers for single blocks or the whole page. Extensible animation pack architecture.
- * Version:           1.1.5
+ * Version:           1.1.6
  * Author:      AWEN01
  * Author URI:  https://awen01.cc
  * License:           GPL-2.0-or-later
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ULTRABGS_VERSION', '1.1.5' );
+define( 'ULTRABGS_VERSION', '1.1.6' );
 define( 'ULTRABGS_URL', plugin_dir_url( __FILE__ ) );
 define( 'ULTRABGS_PATH', plugin_dir_path( __FILE__ ) );
 
@@ -76,6 +76,46 @@ function ultrabgs_get_settings() {
  * Asset registration
  * ------------------------------------------------------------------
  */
+/**
+ * Register the ultrabgs* attributes on every block server-side.
+ *
+ * The editor JS adds these attributes client-side. Dynamic blocks (e.g.
+ * generateblocks-pro/classic-menu) render through the ServerSideRender REST
+ * endpoint, which validates attributes against the registered schema with
+ * additionalProperties:false. Without server-side registration the unknown
+ * ultrabgs* keys make that request fail with 400 Bad Request, which surfaces
+ * as a block error in the editor. Registering them here keeps REST validation
+ * happy.
+ *
+ * @param array  $args Block type registration args.
+ * @param string $name Block name.
+ * @return array
+ */
+function ultrabgs_inject_block_attributes( $args, $name ) {
+	if ( ! is_string( $name ) ) {
+		return $args;
+	}
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+	$ubgs_attrs = array(
+		'ultrabgsEnabled' => array( 'type' => 'boolean', 'default' => false ),
+		'ultrabgsPack'    => array( 'type' => 'string',  'default' => '' ),
+		'ultrabgsColors'  => array( 'type' => 'array',   'default' => array(), 'items' => array( 'type' => 'string' ) ),
+		'ultrabgsOpacity' => array( 'type' => 'number',  'default' => 0.85 ),
+		'ultrabgsSpeed'   => array( 'type' => 'number',  'default' => 1 ),
+		'ultrabgsDensity' => array( 'type' => 'number',  'default' => 1 ),
+		'ultrabgsZIndex'  => array( 'type' => array( 'number', 'string' ), 'default' => 0 ),
+	);
+	foreach ( $ubgs_attrs as $key => $schema ) {
+		if ( ! isset( $args['attributes'][ $key ] ) ) {
+			$args['attributes'][ $key ] = $schema;
+		}
+	}
+	return $args;
+}
+add_filter( 'register_block_type_args', 'ultrabgs_inject_block_attributes', 10, 2 );
+
 function ultrabgs_register_assets() {
 	wp_register_style( 'ultrabgs', ULTRABGS_URL . 'assets/css/ultrabgs.css', array(), ULTRABGS_VERSION );
 	wp_register_script( 'ultrabgs-engine', ULTRABGS_URL . 'assets/js/engine.js', array(), ULTRABGS_VERSION, true );

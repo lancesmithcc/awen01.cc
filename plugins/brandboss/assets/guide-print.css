@@ -1,0 +1,47 @@
+/* Brand guide — print/PDF. Exact colors, page margins, smart breaks so no
+   content is ever clipped: long sections flow across pages, atomic units stay
+   whole, headings stay with their content. */
+
+@page { margin: 14mm; size: letter portrait; }
+
+.bsc-guide { max-width: none; }
+.bsc-guide * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* reveals must not hide content in headless/print rendering */
+.bsc-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+/* hide site chrome + interactive-only bits */
+.bsc-g-downloads, .bsc-g-btn { display: none !important; }
+header.site-header, footer.site-footer, .site-header, .site-footer, #masthead, #colophon,
+nav, .wp-block-navigation, .sidebar, #comments, .comments-area, .entry-title, .page-header { display: none !important; }
+
+/* the fixed-header offset must not add blank space in print */
+.awen01-brand .site-content { padding-top: 0 !important; }
+
+/* cover + back: own pages, no forced full-viewport height (which clipped) */
+.bsc-g-cover { min-height: auto; padding: 28mm 0; page-break-after: always; break-after: page; }
+.bsc-g-back { page-break-before: always; break-before: page; min-height: auto; }
+.bsc-g-back-inner { min-height: auto; }
+
+/* sections flow across pages instead of being forced whole (the clip cause) */
+.bsc-g-section { break-inside: auto; page-break-inside: auto; padding-top: 22px; padding-bottom: 22px; }
+
+/* keep headings with the content that follows */
+.bsc-g-shead, .bsc-g-sub, .bsc-g-eyebrow, h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+
+/* atomic units never split mid-element */
+.bsc-g-logo, .bsc-g-swatch, .bsc-g-rule, .bsc-g-app, .bsc-g-crop, .bsc-g-specimen,
+.bsc-g-space-row, .bsc-g-scale-row, .bsc-g-pair, .bsc-g-do, .bsc-g-dont, .bsc-g-chip,
+.bsc-g-cols > *, .bsc-g-rules-grid > *, figure {
+	break-inside: avoid; page-break-inside: avoid;
+}
+
+/* tables: repeat header, keep rows intact */
+.bsc-g-table thead { display: table-header-group; }
+.bsc-g-table tr { break-inside: avoid; page-break-inside: avoid; }
+
+/* never let media overflow a page */
+img { max-width: 100%; height: auto; }
+.bsc-g-img-grid img, .bsc-g-app img { max-height: 200px; object-fit: cover; }
+
+a { text-decoration: none; color: inherit; }

@@ -13,7 +13,7 @@ class AWEN_DLT_Customizer {
 	public static function register( $wp_customize ) {
 		$wp_customize->add_panel( 'awen_dlt_panel', [
 			'title'       => __( 'Awen01 Dark Light Transcendent', 'awen01-dlt' ),
-			'description' => __( 'Three editable AWEN01 mode palettes for GeneratePress, GenerateBlocks, and Brand Standards Creator tokens.', 'awen01-dlt' ),
+			'description' => __( 'Three editable AWEN01 mode palettes for GeneratePress, GenerateBlocks, and BrandBoss tokens.', 'awen01-dlt' ),
 			'priority'    => 40,
 		] );
 
@@ -76,7 +76,24 @@ class AWEN_DLT_Customizer {
 				'section'     => 'title_tagline',
 				'settings'    => 'awen_dlt_settings[dark_logo]',
 				'label'       => __( 'Dark mode logo', 'awen01-dlt' ),
-				'description' => __( 'Optional. Shown when site is in dark mode. Leave blank to reuse the main logo.', 'awen01-dlt' ),
+				'description' => __( 'Optional. Shown when site is in dark mode. Leave blank to reuse the main (light) logo.', 'awen01-dlt' ),
+				'mime_type'   => 'image',
+				'priority'    => 9,
+			] )
+		);
+
+		$wp_customize->add_setting( 'awen_dlt_settings[transcendent_logo]', [
+			'type'              => 'option',
+			'default'           => 0,
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'absint',
+		] );
+		$wp_customize->add_control(
+			new WP_Customize_Media_Control( $wp_customize, 'awen_dlt_transcendent_logo', [
+				'section'     => 'title_tagline',
+				'settings'    => 'awen_dlt_settings[transcendent_logo]',
+				'label'       => __( 'Transcendent mode logo', 'awen01-dlt' ),
+				'description' => __( 'Optional. Shown when site is in transcendent mode. Leave blank to reuse the main (light) logo.', 'awen01-dlt' ),
 				'mime_type'   => 'image',
 				'priority'    => 9,
 			] )

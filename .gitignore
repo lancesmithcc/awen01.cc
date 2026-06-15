@@ -17,7 +17,8 @@ wp-content/uploads/
 
 wp-content/plugins/*
 !wp-content/plugins/awen01-dark-light-transcendent/
-!wp-content/plugins/brand-standards-creator/
+!wp-content/plugins/brandboss/
+!wp-content/plugins/stockboss/
 !wp-content/plugins/ubgs-awen01/
 !wp-content/plugins/ultrabgs/
 
@@ -26,3 +27,14 @@ wp-content/themes/*
 
 plugins-to-sell/GX-PixelPusher/
 plugins-to-sell/**/.git/
+
+# Debug / scratch artifacts (added during build)
+.playwright-mcp/
+/*.jpeg
+/logo*OLD.png
+/assets/
+/generated-pages/
+
+# Plugins (post-rename paths)
+plugins/GX-PixelPusher/
+plugins/**/.git/

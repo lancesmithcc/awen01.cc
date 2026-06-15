@@ -79,25 +79,67 @@ class AWEN_DLT_Block_Overrides {
 		}
 		$class = 'awen-dlt-' . $uid;
 
-		$rules = self::build_rules( $a );
-		if ( empty( $rules ) ) {
+		// Light mode is the block's native GenerateBlocks definition and is never
+		// overridden here. Dark and transcendent each carry their own bucket of
+		// overrides so editing one mode never affects the other.
+		$modes    = self::normalize_modes( $a );
+		$css      = '';
+		$injected = false;
+
+		foreach ( array( 'dark', 'transcendent' ) as $mode ) {
+			$bucket = isset( $modes[ $mode ] ) && is_array( $modes[ $mode ] ) ? $modes[ $mode ] : array();
+			$rules  = self::build_rules( $bucket );
+			if ( empty( $rules ) ) {
+				continue;
+			}
+
+			if ( ! $injected ) {
+				$html     = self::inject_class( $html, $class );
+				$injected = true;
+			}
+
+			$selector = ':root[data-theme="' . $mode . '"] .' . $class;
+			$css     .= $selector . '{' . implode( ';', $rules ) . '}';
+
+			if ( ! empty( $bucket['textInherit'] ) ) {
+				$css .= $selector . ' :where(p,h1,h2,h3,h4,h5,h6,li,span,a,strong,em){color:inherit}';
+			}
+		}
+
+		if ( '' === $css ) {
 			return $html;
 		}
 
-		$html = self::inject_class( $html, $class );
-
-		$mode = ! empty( $a['mode'] ) ? AWEN_DLT_Colors::sanitize_mode( $a['mode'] ) : 'dark';
-		if ( 'light' === $mode ) {
-			$mode = 'dark';
-		}
-		$selector = ':root[data-theme="' . $mode . '"] .' . $class;
-		$css      = $selector . '{' . implode( ';', $rules ) . '}';
-
-		if ( ! empty( $a['textInherit'] ) ) {
-			$css .= $selector . ' :where(p,h1,h2,h3,h4,h5,h6,li,span,a,strong,em){color:inherit}';
-		}
-
 		return $html . '<style>' . $css . '</style>';
+	}
+
+	/**
+	 * Return per-mode override buckets keyed by mode.
+	 *
+	 * Supports the current schema ( awenDlt.modes.{dark,transcendent} ) and
+	 * migrates the legacy flat schema ( single mode + flat color fields ).
+	 *
+	 * @param array $a The awenDlt attribute.
+	 * @return array
+	 */
+	private static function normalize_modes( $a ) {
+		if ( ! empty( $a['modes'] ) && is_array( $a['modes'] ) ) {
+			return $a['modes'];
+		}
+
+		$legacy_mode = ! empty( $a['mode'] ) ? AWEN_DLT_Colors::sanitize_mode( $a['mode'] ) : 'dark';
+		if ( 'light' === $legacy_mode ) {
+			$legacy_mode = 'dark';
+		}
+
+		$bucket = array();
+		foreach ( array( 'bgColor', 'textColor', 'borderColor', 'bgImage', 'bgImageId', 'gradient', 'bgOverlay', 'textInherit' ) as $k ) {
+			if ( isset( $a[ $k ] ) && '' !== $a[ $k ] ) {
+				$bucket[ $k ] = $a[ $k ];
+			}
+		}
+
+		return empty( $bucket ) ? array() : array( $legacy_mode => $bucket );
 	}
 
 	private static function build_rules( $a ) {
@@ -107,6 +149,15 @@ class AWEN_DLT_Block_Overrides {
 			$hex = sanitize_hex_color( $a['bgColor'] );
 			if ( $hex ) {
 				$rules[] = 'background-color:' . $hex;
+			}
+		}
+
+		if ( ! empty( $a['borderColor'] ) ) {
+			$hex = sanitize_hex_color( $a['borderColor'] );
+			if ( $hex ) {
+				// Recolor the block's existing border for this mode. Keeps the
+				// light-mode border width/style; only the color shifts.
+				$rules[] = 'border-color:' . $hex;
 			}
 		}
 

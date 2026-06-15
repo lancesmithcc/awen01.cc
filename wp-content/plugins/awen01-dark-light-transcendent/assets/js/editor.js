@@ -6,6 +6,7 @@
 
 	var el = wp.element.createElement;
 	var Fragment = wp.element.Fragment;
+	var useState = wp.element.useState;
 	var addFilter = wp.hooks.addFilter;
 	var createHOC = wp.compose.createHigherOrderComponent;
 	var InspectorControls = wp.blockEditor.InspectorControls;
@@ -19,9 +20,12 @@
 	var PanelBody = wp.components.PanelBody;
 	var BaseControl = wp.components.BaseControl;
 	var Button = wp.components.Button;
-	var SelectControl = wp.components.SelectControl;
+	var ButtonGroup = wp.components.ButtonGroup;
 	var ToggleControl = wp.components.ToggleControl;
 	var __ = wp.i18n.__;
+
+	var EDIT_MODES = ['dark', 'transcendent'];
+	var FLAT_KEYS = ['bgColor', 'textColor', 'borderColor', 'bgImage', 'bgImageId', 'gradient', 'bgOverlay', 'textInherit'];
 
 	var palette = (cfg.palette || []).map(function (p) {
 		return { name: p.name, color: p.color, slug: p.slug };
@@ -39,36 +43,101 @@
 		return 'd' + Math.random().toString(36).slice(2, 9);
 	}
 
+	// Return per-mode buckets, migrating the legacy flat schema if present.
+	function normalizeModes(awenDlt) {
+		if (awenDlt && awenDlt.modes && typeof awenDlt.modes === 'object') {
+			return Object.assign({}, awenDlt.modes);
+		}
+		var modes = {};
+		if (awenDlt) {
+			var bucket = {};
+			FLAT_KEYS.forEach(function (k) {
+				if (awenDlt[k] !== undefined && awenDlt[k] !== '' && awenDlt[k] !== 0) {
+					bucket[k] = awenDlt[k];
+				}
+			});
+			if (Object.keys(bucket).length) {
+				var m = (awenDlt.mode && awenDlt.mode !== 'light') ? awenDlt.mode : 'dark';
+				modes[m] = bucket;
+			}
+		}
+		return modes;
+	}
+
+	function bucketHasContent(bucket) {
+		return bucket && Object.keys(bucket).some(function (k) {
+			return k !== 'bgImageId' && bucket[k] !== undefined && bucket[k] !== '' && bucket[k] !== 0 && bucket[k] !== false;
+		});
+	}
+
 	var Panel = function (props) {
+		var modeState = useState('dark');
+		var editMode = modeState[0];
+		var setEditMode = modeState[1];
+
 		var awenDlt = props.attributes.awenDlt || {};
+		var modes = normalizeModes(awenDlt);
+		var bucket = modes[editMode] || {};
+
+		function commit(nextModes) {
+			Object.keys(nextModes).forEach(function (m) {
+				if (!bucketHasContent(nextModes[m])) { delete nextModes[m]; }
+			});
+			if (Object.keys(nextModes).length === 0) {
+				props.setAttributes({ awenDlt: {} });
+				return;
+			}
+			props.setAttributes({ awenDlt: { uid: awenDlt.uid || genUid(), modes: nextModes } });
+		}
 
 		function update(key, value) {
-			var next = Object.assign({}, awenDlt);
-			next[key] = value;
-			if (!next.uid) { next.uid = genUid(); }
-			var hasAny = ['bgColor','textColor','bgImage','gradient','bgOverlay','textInherit'].some(function (k) { return next[k]; })
-				|| (next.mode && next.mode !== 'dark');
-			if (!hasAny) { next = {}; }
-			props.setAttributes({ awenDlt: next });
+			var nextModes = normalizeModes(props.attributes.awenDlt || {});
+			var b = Object.assign({}, nextModes[editMode] || {});
+			if (value === '' || value === 0 || value === false || value === null || value === undefined) {
+				delete b[key];
+			} else {
+				b[key] = value;
+			}
+			nextModes[editMode] = b;
+			commit(nextModes);
+		}
+
+		function updateImage(url, id) {
+			var nextModes = normalizeModes(props.attributes.awenDlt || {});
+			var b = Object.assign({}, nextModes[editMode] || {});
+			if (url) {
+				b.bgImage = url;
+				b.bgImageId = id || 0;
+			} else {
+				delete b.bgImage;
+				delete b.bgImageId;
+			}
+			nextModes[editMode] = b;
+			commit(nextModes);
 		}
 
 		var children = [];
 
-		children.push(el(SelectControl, {
-			key: 'mode',
-			label: __('Target mode', 'awen01-dlt'),
-			value: awenDlt.mode || 'dark',
-			options: [
-				{ label: __('Dark', 'awen01-dlt'), value: 'dark' },
-				{ label: __('Transcendent', 'awen01-dlt'), value: 'transcendent' }
-			],
-			onChange: function (v) { update('mode', v || 'dark'); }
-		}));
+		children.push(el(BaseControl, {
+			label: __('Editing mode', 'awen01-dlt'),
+			help: __('Light mode uses the block native GenerateBlocks colors. Set dark and transcendent overrides independently here.', 'awen01-dlt'),
+			__nextHasNoMarginBottom: true,
+			key: 'editmode'
+		},
+			el(ButtonGroup, null, EDIT_MODES.map(function (m) {
+				var has = bucketHasContent(modes[m]);
+				return el(Button, {
+					key: m,
+					variant: editMode === m ? 'primary' : 'secondary',
+					onClick: function () { setEditMode(m); }
+				}, (m === 'dark' ? __('Dark', 'awen01-dlt') : __('Transcendent', 'awen01-dlt')) + (has ? ' ●' : ''));
+			}))
+		));
 
 		children.push(el(BaseControl, { label: __('Mode background color', 'awen01-dlt'), __nextHasNoMarginBottom: true, key: 'bgc' },
 			el(ColorPalette, {
 				colors: palette,
-				value: awenDlt.bgColor || '',
+				value: bucket.bgColor || '',
 				onChange: function (v) { update('bgColor', v || ''); },
 				clearable: true
 			})
@@ -77,8 +146,17 @@
 		children.push(el(BaseControl, { label: __('Mode text color', 'awen01-dlt'), __nextHasNoMarginBottom: true, key: 'tc' },
 			el(ColorPalette, {
 				colors: palette,
-				value: awenDlt.textColor || '',
+				value: bucket.textColor || '',
 				onChange: function (v) { update('textColor', v || ''); },
+				clearable: true
+			})
+		));
+
+		children.push(el(BaseControl, { label: __('Mode border color', 'awen01-dlt'), help: __('Recolors the block existing border for this mode.', 'awen01-dlt'), __nextHasNoMarginBottom: true, key: 'bdc' },
+			el(ColorPalette, {
+				colors: palette,
+				value: bucket.borderColor || '',
+				onChange: function (v) { update('borderColor', v || ''); },
 				clearable: true
 			})
 		));
@@ -86,14 +164,14 @@
 		children.push(el(ToggleControl, {
 			key: 'ti',
 			label: __('Apply text color to child headings/links', 'awen01-dlt'),
-			checked: !!awenDlt.textInherit,
+			checked: !!bucket.textInherit,
 			onChange: function (v) { update('textInherit', v ? 1 : 0); }
 		}));
 
 		if (GradientPicker) {
 			children.push(el(BaseControl, { label: __('Mode background gradient', 'awen01-dlt'), __nextHasNoMarginBottom: true, key: 'gr' },
 				el(GradientPicker, {
-					value: awenDlt.gradient ? awenDlt.gradient : undefined,
+					value: bucket.gradient ? bucket.gradient : undefined,
 					gradients: [],
 					onChange: function (v) { update('gradient', v || ''); },
 					clearable: true,
@@ -107,27 +185,22 @@
 				el(MediaUploadCheck, null,
 					el(MediaUpload, {
 						allowedTypes: ['image'],
-						value: awenDlt.bgImageId || 0,
-						onSelect: function (m) {
-							update('bgImage', m.url);
-							var next = Object.assign({}, props.attributes.awenDlt || {}, { bgImage: m.url, bgImageId: m.id });
-							if (!next.uid) { next.uid = genUid(); }
-							props.setAttributes({ awenDlt: next });
-						},
+						value: bucket.bgImageId || 0,
+						onSelect: function (m) { updateImage(m.url, m.id); },
 						render: function (obj) {
 							return el(Fragment, null,
-								awenDlt.bgImage
-									? el('img', { src: awenDlt.bgImage, alt: '', style: { maxWidth: '100%', marginBottom: '8px', borderRadius: '4px' } })
+								bucket.bgImage
+									? el('img', { src: bucket.bgImage, alt: '', style: { maxWidth: '100%', marginBottom: '8px', borderRadius: '4px' } })
 									: null,
 								el(Button, { variant: 'secondary', onClick: obj.open },
-									awenDlt.bgImage ? __('Replace image', 'awen01-dlt') : __('Select image', 'awen01-dlt')
+									bucket.bgImage ? __('Replace image', 'awen01-dlt') : __('Select image', 'awen01-dlt')
 								),
-								awenDlt.bgImage
+								bucket.bgImage
 									? el(Button, {
 										variant: 'link',
 										isDestructive: true,
 										style: { marginLeft: '8px' },
-										onClick: function () { update('bgImage', ''); }
+										onClick: function () { updateImage('', 0); }
 									}, __('Remove', 'awen01-dlt'))
 									: null
 							);
@@ -140,7 +213,7 @@
 		if (GradientPicker) {
 			children.push(el(BaseControl, { label: __('Overlay gradient (above image)', 'awen01-dlt'), __nextHasNoMarginBottom: true, key: 'ov' },
 				el(GradientPicker, {
-					value: awenDlt.bgOverlay ? awenDlt.bgOverlay : undefined,
+					value: bucket.bgOverlay ? bucket.bgOverlay : undefined,
 					gradients: [],
 					onChange: function (v) { update('bgOverlay', v || ''); },
 					clearable: true,

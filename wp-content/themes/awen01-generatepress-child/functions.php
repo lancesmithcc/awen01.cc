@@ -9,19 +9,20 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const AWEN01_CHILD_VERSION = '0.1.8';
+const AWEN01_CHILD_VERSION = '0.6.9';
 
 add_action( 'wp_enqueue_scripts', 'awen01_child_enqueue_assets', 20 );
-add_action( 'enqueue_block_editor_assets', 'awen01_child_enqueue_assets', 20 );
+add_filter( 'block_editor_settings_all', 'awen01_child_add_editor_canvas_styles' );
 add_action( 'after_setup_theme', 'awen01_child_setup' );
 add_action( 'init', 'awen01_child_register_patterns' );
 add_action( 'wp_body_open', 'awen01_child_print_global_motifs', 5 );
+add_filter( 'bsc_brand_data', 'awen01_child_inject_dlt_logos_into_brand' );
 
 function awen01_child_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'custom-logo', array(
-		'height'      => 68,
-		'width'       => 68,
+		'height'      => 144,
+		'width'       => 144,
 		'flex-height' => true,
 		'flex-width'  => true,
 	) );
@@ -42,9 +43,39 @@ function awen01_child_enqueue_assets() {
 		AWEN01_CHILD_VERSION
 	);
 
+	wp_enqueue_script(
+		'awen01-child',
+		get_stylesheet_directory_uri() . '/assets/js/awen01.js',
+		array(),
+		AWEN01_CHILD_VERSION,
+		true
+	);
+
 	if ( ! is_admin() && function_exists( 'ultrabgs_enqueue_all_packs' ) ) {
 		ultrabgs_enqueue_all_packs();
 	}
+}
+
+/**
+ * Load the AWEN01 brand stylesheet and Jost font into the block editor canvas
+ * (the editor iframe) so sections render with brand colors, type, and motif
+ * styling while editing — matching the front end. Content stays fully editable
+ * as normal GeneratePress / GenerateBlocks blocks.
+ */
+function awen01_child_add_editor_canvas_styles( $settings ) {
+	$settings['styles'][] = array(
+		'css' => '@import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;700&display=swap");',
+	);
+
+	$file = get_stylesheet_directory() . '/assets/css/awen01.css';
+	if ( file_exists( $file ) ) {
+		$css = file_get_contents( $file ); // phpcs:ignore
+		if ( $css ) {
+			$settings['styles'][] = array( 'css' => $css );
+		}
+	}
+
+	return $settings;
 }
 
 add_filter( 'body_class', function ( $classes ) {
@@ -70,7 +101,7 @@ function awen01_child_append_motion_to_brand_json( $out, $brand ) {
 
 add_filter( 'the_content', 'awen01_child_append_motion_to_guide' );
 function awen01_child_append_motion_to_guide( $content ) {
-	if ( ! is_page( 'brand-standards' ) || ! in_the_loop() || ! is_main_query() ) {
+	if ( ! is_page( 'brandboss-guide' ) || ! in_the_loop() || ! is_main_query() ) {
 		return $content;
 	}
 
@@ -263,4 +294,70 @@ HTML;
 		'categories'  => array( 'awen01' ),
 		'content'     => $pattern,
 	) );
+}
+
+/**
+ * Inject the DLT mode-specific logos (light, dark, transcendent) into the
+ * BrandBoss data so the guide page shows each logo variant
+ * with its correct background mode label — fed from the Customizer.
+ */
+function awen01_child_inject_dlt_logos_into_brand( $brand ) {
+	if ( ! is_array( $brand ) ) {
+		return $brand;
+	}
+
+	$settings    = get_option( 'awen_dlt_settings', array() );
+	$custom_logo = get_theme_mod( 'custom_logo' );
+	$site_name   = get_bloginfo( 'name' );
+
+	$logos = array();
+
+	// Light mode — the main custom logo (shown on light / default)
+	if ( $custom_logo ) {
+		$logos[] = array(
+			'id'            => 'dlt-light',
+			'attachment_id' => (int) $custom_logo,
+			'label'         => $site_name . ' — Light Mode',
+			'variant'       => 'primary',
+			'background'    => 'light',
+			'min_size_px'   => '144',
+			'clearspace'    => '24px',
+			'notes'         => 'Default logo for light backgrounds. Set via Appearance → Customize → Site Identity.',
+		);
+	}
+
+	// Dark mode logo
+	if ( ! empty( $settings['dark_logo'] ) ) {
+		$logos[] = array(
+			'id'            => 'dlt-dark',
+			'attachment_id' => (int) $settings['dark_logo'],
+			'label'         => $site_name . ' — Dark Mode',
+			'variant'       => 'inverse',
+			'background'    => 'dark',
+			'min_size_px'   => '144',
+			'clearspace'    => '24px',
+			'notes'         => 'Inverse logo for dark backgrounds. Set via Appearance → Customize → AWEN01 Color Modes.',
+		);
+	}
+
+	// Transcendent mode logo
+	if ( ! empty( $settings['transcendent_logo'] ) ) {
+		$logos[] = array(
+			'id'            => 'dlt-transcendent',
+			'attachment_id' => (int) $settings['transcendent_logo'],
+			'label'         => $site_name . ' — Transcendent Mode',
+			'variant'       => 'mono',
+			'background'    => 'any',
+			'min_size_px'   => '144',
+			'clearspace'    => '24px',
+			'notes'         => 'Neutral logo for the transcendent / threshold mode. Set via Appearance → Customize → AWEN01 Color Modes.',
+		);
+	}
+
+	// Append DLT logos to existing brand logos
+	if ( $logos ) {
+		$brand['logos'] = array_merge( (array) ( $brand['logos'] ?? array() ), $logos );
+	}
+
+	return $brand;
 }

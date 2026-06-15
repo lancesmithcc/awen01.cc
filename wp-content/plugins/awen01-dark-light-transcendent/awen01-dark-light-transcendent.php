@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AWEN_DLT_VERSION', '1.0.1' );
+define( 'AWEN_DLT_VERSION', '1.0.4' );
 define( 'AWEN_DLT_FILE', __FILE__ );
 define( 'AWEN_DLT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AWEN_DLT_URL', plugin_dir_url( __FILE__ ) );

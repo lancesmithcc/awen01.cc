@@ -19,6 +19,8 @@
 .awen-dlt-float--bottom-right{bottom:max(var(--awen-dlt-edge),env(safe-area-inset-bottom));right:max(var(--awen-dlt-edge),env(safe-area-inset-right))}
 .awen-dlt-float--bottom-left{bottom:max(var(--awen-dlt-edge),env(safe-area-inset-bottom));left:max(var(--awen-dlt-edge),env(safe-area-inset-left))}
 .awen-dlt-float .awen-dlt-toggle{backdrop-filter:blur(14px);box-shadow:0 8px 28px rgba(0,0,0,.2);max-width:calc(100vw - var(--awen-dlt-edge) * 2);pointer-events:auto}
-img.awen-dlt-logo-dark{display:none!important}
-:root[data-theme="dark"] img.awen-dlt-logo-light{display:none!important}
-:root[data-theme="dark"] img.awen-dlt-logo-dark{display:inline-block!important}
+img.awen-dlt-logo-dark,img.awen-dlt-logo-transcendent{display:none!important}
+:root[data-theme="dark"] a.has-dlt-dark img.awen-dlt-logo-light{display:none!important}
+:root[data-theme="dark"] a.has-dlt-dark img.awen-dlt-logo-dark{display:inline-block!important}
+:root[data-theme="transcendent"] a.has-dlt-transcendent img.awen-dlt-logo-light{display:none!important}
+:root[data-theme="transcendent"] a.has-dlt-transcendent img.awen-dlt-logo-transcendent{display:inline-block!important}

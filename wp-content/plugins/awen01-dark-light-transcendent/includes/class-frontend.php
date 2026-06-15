@@ -10,83 +10,97 @@ class AWEN_DLT_Frontend {
 		add_action( 'wp_head', [ __CLASS__, 'print_preload_script' ], 1 );
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue' ] );
 		add_action( 'wp_footer', [ __CLASS__, 'maybe_print_floating_toggle' ] );
-		add_filter( 'get_custom_logo', [ __CLASS__, 'inject_dark_logo' ], 20, 2 );
-		add_filter( 'generate_logo_output', [ __CLASS__, 'inject_dark_logo' ], 20 );
-		add_filter( 'generate_retina_logo_output', [ __CLASS__, 'inject_dark_logo' ], 20 );
-		add_filter( 'generate_mobile_header_logo_output', [ __CLASS__, 'inject_dark_logo' ], 20 );
+		add_filter( 'get_custom_logo', [ __CLASS__, 'inject_mode_logos' ], 20, 2 );
+		add_filter( 'generate_logo_output', [ __CLASS__, 'inject_mode_logos' ], 20 );
+		add_filter( 'generate_retina_logo_output', [ __CLASS__, 'inject_mode_logos' ], 20 );
+		add_filter( 'generate_mobile_header_logo_output', [ __CLASS__, 'inject_mode_logos' ], 20 );
 	}
 
-	public static function inject_dark_logo( $html ) {
+	/**
+	 * Add per-mode logo variants (dark, transcendent) alongside the main
+	 * (light) logo. Each variant is appended as a sibling <img>; toggle.css
+	 * shows the one matching the active data-theme. The wrapper <a> is flagged
+	 * with has-dlt-* classes so the light logo is only hidden when a variant
+	 * actually exists for that mode.
+	 */
+	public static function inject_mode_logos( $html ) {
 		if ( empty( $html ) || false === stripos( $html, '<img' ) ) {
 			return $html;
 		}
 
 		$settings = get_option( AWEN_DLT_SETTINGS, [] );
-		$dark_id  = isset( $settings['dark_logo'] ) ? (int) $settings['dark_logo'] : 0;
-		if ( ! $dark_id ) {
-			return $html;
-		}
+		$variants = [
+			'dark'         => isset( $settings['dark_logo'] ) ? (int) $settings['dark_logo'] : 0,
+			'transcendent' => isset( $settings['transcendent_logo'] ) ? (int) $settings['transcendent_logo'] : 0,
+		];
 
-		$dark_src = wp_get_attachment_image_url( $dark_id, 'full' );
-		if ( ! $dark_src ) {
+		$sources = [];
+		foreach ( $variants as $mode => $id ) {
+			if ( $id ) {
+				$src = wp_get_attachment_image_url( $id, 'full' );
+				if ( $src ) {
+					$sources[ $mode ] = $src;
+				}
+			}
+		}
+		if ( empty( $sources ) ) {
 			return $html;
 		}
 
 		$light_class = 'awen-dlt-logo-light';
-		$dark_class  = 'awen-dlt-logo-dark';
 		$alt         = esc_attr( get_bloginfo( 'name' ) );
 
-		$dark_img_html = '';
-		$light_img_html = '';
-
-		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			$p = new WP_HTML_Tag_Processor( $html );
-			if ( $p->next_tag( [ 'tag_name' => 'IMG' ] ) ) {
-				$p->add_class( $light_class );
-				$html = $p->get_updated_html();
-
-				$p2 = new WP_HTML_Tag_Processor( $html );
-				$p2->next_tag( [ 'tag_name' => 'IMG' ] );
-				$light_src    = $p2->get_attribute( 'src' );
-				$light_srcset = $p2->get_attribute( 'srcset' );
-				$light_sizes  = $p2->get_attribute( 'sizes' );
-				$light_w      = $p2->get_attribute( 'width' );
-				$light_h      = $p2->get_attribute( 'height' );
-				$light_class_attr = $p2->get_attribute( 'class' );
-
-				$dark_attrs = [
-					'class'    => preg_replace( '/\b' . preg_quote( $light_class, '/' ) . '\b/', $dark_class, (string) $light_class_attr ),
-					'src'      => $dark_src,
-					'alt'      => $alt,
-					'decoding' => 'async',
-				];
-				if ( $light_w ) { $dark_attrs['width']  = $light_w; }
-				if ( $light_h ) { $dark_attrs['height'] = $light_h; }
-
-				$attr_str = '';
-				foreach ( $dark_attrs as $k => $v ) {
-					$attr_str .= ' ' . $k . '="' . esc_attr( $v ) . '"';
-				}
-				$dark_img_html = '<img' . $attr_str . ' />';
-			}
-		} else {
-			$html = preg_replace( '/(<img\b[^>]*\bclass=")/i', '$1' . $light_class . ' ', $html, 1 );
-			$dark_img_html = sprintf(
-				'<img class="custom-logo %s" src="%s" alt="%s" decoding="async" />',
-				esc_attr( $dark_class ),
-				esc_url( $dark_src ),
-				$alt
-			);
-		}
-
-		if ( ! $dark_img_html ) {
+		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 			return $html;
 		}
 
-		if ( preg_match( '/<\/a>\s*$/i', $html ) ) {
-			return preg_replace( '/(<\/a>\s*)$/i', $dark_img_html . '$1', $html, 1 );
+		$p = new WP_HTML_Tag_Processor( $html );
+		if ( ! $p->next_tag( [ 'tag_name' => 'IMG' ] ) ) {
+			return $html;
 		}
-		return $html . $dark_img_html;
+		$p->add_class( $light_class );
+		$html = $p->get_updated_html();
+
+		$p2 = new WP_HTML_Tag_Processor( $html );
+		$p2->next_tag( [ 'tag_name' => 'IMG' ] );
+		$light_w          = $p2->get_attribute( 'width' );
+		$light_h          = $p2->get_attribute( 'height' );
+		$light_class_attr = (string) $p2->get_attribute( 'class' );
+
+		$variant_html = '';
+		foreach ( $sources as $mode => $src ) {
+			$variant_class = 'awen-dlt-logo-' . $mode;
+			$attrs = [
+				'class'    => preg_replace( '/\b' . preg_quote( $light_class, '/' ) . '\b/', $variant_class, $light_class_attr ),
+				'src'      => $src,
+				'alt'      => $alt,
+				'decoding' => 'async',
+			];
+			if ( $light_w ) { $attrs['width']  = $light_w; }
+			if ( $light_h ) { $attrs['height'] = $light_h; }
+
+			$attr_str = '';
+			foreach ( $attrs as $k => $v ) {
+				$attr_str .= ' ' . $k . '="' . esc_attr( $v ) . '"';
+			}
+			$variant_html .= '<img' . $attr_str . ' />';
+		}
+
+		// Flag the wrapper anchor so light is hidden only where a variant exists.
+		$flag = '';
+		foreach ( array_keys( $sources ) as $mode ) {
+			$flag .= ' has-dlt-' . $mode;
+		}
+		$pa = new WP_HTML_Tag_Processor( $html );
+		if ( $pa->next_tag( [ 'tag_name' => 'A' ] ) ) {
+			$pa->add_class( trim( $flag ) );
+			$html = $pa->get_updated_html();
+		}
+
+		if ( preg_match( '/<\/a>\s*$/i', $html ) ) {
+			return preg_replace( '/(<\/a>\s*)$/i', $variant_html . '$1', $html, 1 );
+		}
+		return $html . $variant_html;
 	}
 
 	public static function enqueue() {
