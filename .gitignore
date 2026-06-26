@@ -18,9 +18,17 @@ wp-content/uploads/
 wp-content/plugins/*
 !wp-content/plugins/awen01-dark-light-transcendent/
 !wp-content/plugins/brandboss/
+!wp-content/plugins/cyclical-dynamic-palettes/
 !wp-content/plugins/stockboss/
+!wp-content/plugins/taxonomy-query/
+!wp-content/plugins/ubgs-ascii-art/
 !wp-content/plugins/ubgs-awen01/
+!wp-content/plugins/ubgs-elemental/
+!wp-content/plugins/ubgs-luxury/
+!wp-content/plugins/ubgs-retro-future/
+!wp-content/plugins/ubgs-sonic/
 !wp-content/plugins/ultrabgs/
+!wp-content/plugins/yolo-scroll/
 
 wp-content/themes/*
 !wp-content/themes/awen01-generatepress-child/
@@ -30,10 +38,6 @@ plugins-to-sell/**/.git/
 
 # Debug / scratch artifacts (added during build)
 .playwright-mcp/
-/*.jpeg
-/logo*OLD.png
-/assets/
-/generated-pages/
 
 # Plugins (post-rename paths)
 plugins/GX-PixelPusher/

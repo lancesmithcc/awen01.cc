@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Stockboss
- * Description: Generate and standardize stock images directly in Gutenberg using secured provider API keys.
- * Version: 0.1.7
+ * Description: Generate and standardize stock images directly in Gutenberg with the most cutting-edge image models on OpenRouter (GPT-5.4 Image 2, Gemini 3 Pro Image, Seedream 4.5). Syncs with BrandBoss for shared brand image standards and one-click approve-to-brand-library — works standalone too.
+ * Version: 0.2.0
  * Author: AWEN01.cc
  * Author URI: https://www.awen01.cc
  * Text Domain: stockboss
@@ -12,7 +12,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('STOCKBOSS_VERSION', '0.1.7');
+define('STOCKBOSS_VERSION', '0.2.0');
 define('STOCKBOSS_PLUGIN_FILE', __FILE__);
 define('STOCKBOSS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('STOCKBOSS_PLUGIN_URL', plugin_dir_url(__FILE__));

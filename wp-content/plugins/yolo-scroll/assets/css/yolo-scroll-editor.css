@@ -1,0 +1,13 @@
+/* Yolo Scroll — block editor styles.
+   Registered by enqueue_editor_assets(); kept present so the editor does not
+   404. Scroll-motion effects are disabled in the editor canvas so authored
+   content stays visible and stable while editing. */
+
+.editor-styles-wrapper [data-sm-effect],
+.editor-styles-wrapper .yolo-sm,
+.editor-styles-wrapper .yolo-scroll {
+	opacity: 1 !important;
+	transform: none !important;
+	animation: none !important;
+	transition: none !important;
+}

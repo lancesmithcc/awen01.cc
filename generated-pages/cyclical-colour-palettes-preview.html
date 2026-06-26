@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cyclical Colour Palettes | AWEN01</title>
+  <style>
+    :root {
+      --bsc-color-labradorite-ink: #08110f;
+      --bsc-color-black-opal: #12151a;
+      --bsc-color-shadow-evergreen: #161d1a;
+      --bsc-color-aurora-teal: #36d6c7;
+      --bsc-color-spectral-blue: #6b9cff;
+      --bsc-color-opal-violet: #a98bff;
+      --bsc-color-lavender-opal: #ded8ff;
+      --bsc-color-moon-white: #f7f8fb;
+      --bsc-color-ink-text: #1d2527;
+      --bsc-color-mist-slate: #606a70;
+      --bsc-color-muted-labradorite: #4f7c72;
+      --site-max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bsc-color-labradorite-ink);
+      color: var(--bsc-color-moon-white);
+      font-family: Jost, Avenir, Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: inherit; }
+
+    .site-shell {
+      background:
+        radial-gradient(circle at 20% 0%, rgba(54,214,199,.08), transparent 28rem),
+        radial-gradient(circle at 80% 8%, rgba(169,139,255,.1), transparent 30rem),
+        var(--bsc-color-labradorite-ink);
+      min-height: 100vh;
+    }
+
+    .site-header {
+      align-items: center;
+      backdrop-filter: blur(18px);
+      background: rgba(8,17,15,.72);
+      border-bottom: 1px solid rgba(247,248,251,.1);
+      display: flex;
+      justify-content: space-between;
+      left: 0;
+      padding: 1rem 1.5rem;
+      position: sticky;
+      right: 0;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      align-items: center;
+      display: inline-flex;
+      gap: .75rem;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      background: linear-gradient(135deg, var(--bsc-color-aurora-teal), var(--bsc-color-opal-violet));
+      border-radius: 50%;
+      box-shadow: 0 0 32px rgba(54,214,199,.22);
+      display: block;
+      height: 2rem;
+      width: 2rem;
+    }
+
+    .brand-name {
+      color: var(--bsc-color-moon-white);
+      font-size: .8125rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .site-nav {
+      align-items: center;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .site-nav a {
+      color: rgba(247,248,251,.72);
+      font-size: .875rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .site-nav a:last-child {
+      border: 1px solid rgba(247,248,251,.24);
+      border-radius: 4px;
+      color: var(--bsc-color-moon-white);
+      padding: .625rem .875rem;
+    }
+
+    .hero {
+      align-items: center;
+      display: flex;
+      min-height: 74vh;
+      overflow: hidden;
+      padding: 7rem 1.5rem;
+      position: relative;
+    }
+
+    .hero::before {
+      animation: auroraDrift 18s ease-in-out infinite alternate;
+      background:
+        radial-gradient(circle at 74% 24%, rgba(54,214,199,.42) 0%, transparent 22%),
+        radial-gradient(circle at 88% 78%, rgba(169,139,255,.38) 0%, transparent 24%),
+        radial-gradient(circle at 36% 64%, rgba(107,156,255,.18) 0%, transparent 28%);
+      bottom: -10%;
+      content: "";
+      left: -8%;
+      position: absolute;
+      right: -8%;
+      top: -10%;
+      z-index: 0;
+    }
+
+    .hero::after {
+      background:
+        linear-gradient(100deg, rgba(8,17,15,.94) 34%, rgba(8,17,15,.58) 100%),
+        linear-gradient(0deg, rgba(8,17,15,.6), transparent 52%);
+      bottom: 0;
+      content: "";
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 1;
+    }
+
+    .hero-grid {
+      display: grid;
+      gap: 4rem;
+      grid-template-columns: minmax(0,1fr) minmax(280px,.76fr);
+      margin: 0 auto;
+      max-width: var(--site-max);
+      position: relative;
+      width: 100%;
+      z-index: 3;
+    }
+
+    .eyebrow {
+      color: var(--bsc-color-aurora-teal);
+      font-size: .8125rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      margin: 0 0 1rem;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      color: var(--bsc-color-moon-white);
+      font-size: clamp(3rem,6vw,5.5rem);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.04;
+      margin-bottom: 1.25rem;
+      max-width: 820px;
+    }
+
+    h2 {
+      font-size: clamp(1.875rem,3.5vw,2.875rem);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.14;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: clamp(1.25rem,2vw,1.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: .75rem;
+    }
+
+    .hero-copy {
+      color: rgba(247,248,251,.78);
+      font-size: 1.1875rem;
+      font-weight: 300;
+      line-height: 1.78;
+      margin-bottom: 2rem;
+      max-width: 720px;
+    }
+
+    .button-row {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .button {
+      border-radius: 4px;
+      display: inline-flex;
+      font-weight: 700;
+      letter-spacing: .01em;
+      padding: .9375rem 2rem;
+      text-decoration: none;
+    }
+
+    .button-primary {
+      background: var(--bsc-color-aurora-teal);
+      color: var(--bsc-color-labradorite-ink);
+    }
+
+    .button-secondary {
+      border: 1px solid rgba(247,248,251,.45);
+      color: var(--bsc-color-moon-white);
+      padding: .875rem 1.5rem;
+    }
+
+    .rule-stack {
+      background: rgba(247,248,251,.08);
+      border: 1px solid rgba(247,248,251,.16);
+      border-radius: 8px;
+      display: grid;
+      gap: 1rem;
+      padding: 1.25rem;
+    }
+
+    .rule-stack__label {
+      color: rgba(247,248,251,.62);
+      font-size: .8125rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      margin-bottom: 0;
+      text-transform: uppercase;
+    }
+
+    .rule {
+      background: rgba(247,248,251,.07);
+      border-radius: 6px;
+      color: rgba(247,248,251,.72);
+      font-size: .9375rem;
+      font-weight: 300;
+      line-height: 1.7;
+      padding: 1rem;
+    }
+
+    .rule strong {
+      color: var(--bsc-color-moon-white);
+      font-weight: 700;
+    }
+
+    .rule.is-active {
+      background: rgba(54,214,199,.16);
+      border-left: 4px solid var(--bsc-color-aurora-teal);
+      color: var(--bsc-color-moon-white);
+    }
+
+    .section {
+      padding: 5.5rem 1.5rem;
+    }
+
+    .section-light {
+      background: var(--bsc-color-moon-white);
+      color: var(--bsc-color-ink-text);
+    }
+
+    .section-dark {
+      background: var(--bsc-color-black-opal);
+      color: var(--bsc-color-moon-white);
+    }
+
+    .section-opal {
+      background: var(--bsc-color-lavender-opal);
+      color: var(--bsc-color-labradorite-ink);
+      text-align: center;
+    }
+
+    .inner {
+      margin: 0 auto;
+      max-width: var(--site-max);
+    }
+
+    .section-light .eyebrow,
+    .section-opal .eyebrow {
+      color: var(--bsc-color-muted-labradorite);
+    }
+
+    .section-copy {
+      color: var(--bsc-color-mist-slate);
+      font-size: 1.0625rem;
+      font-weight: 300;
+      line-height: 1.75;
+      margin-bottom: 2.75rem;
+      max-width: 780px;
+    }
+
+    .section-dark .section-copy {
+      color: rgba(247,248,251,.76);
+    }
+
+    .card-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 2rem;
+    }
+
+    .card .kicker {
+      color: var(--bsc-color-aurora-teal);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .card p {
+      color: var(--bsc-color-mist-slate);
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 0;
+    }
+
+    .engine-grid {
+      display: grid;
+      gap: 3rem;
+      grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr);
+    }
+
+    .code-panel {
+      background: rgba(8,17,15,.72);
+      border: 1px solid rgba(247,248,251,.16);
+      border-radius: 8px;
+      padding: 2rem;
+    }
+
+    .code-panel p:last-child {
+      color: rgba(247,248,251,.82);
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.85;
+      margin-bottom: 0;
+    }
+
+    .visual-band {
+      align-items: center;
+      display: grid;
+      gap: 3rem;
+      grid-template-columns: minmax(0,1.02fr) minmax(0,.98fr);
+      margin-top: 4rem;
+    }
+
+    .visual-band img {
+      aspect-ratio: 16 / 10;
+      border-radius: 8px;
+      display: block;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .visual-note {
+      border-left: 3px solid var(--bsc-color-aurora-teal);
+      color: rgba(247,248,251,.72);
+      font-weight: 300;
+      line-height: 1.78;
+      padding-left: 1.25rem;
+    }
+
+    .cta-copy {
+      color: #2c1f5e;
+      font-size: 1.0625rem;
+      font-weight: 300;
+      line-height: 1.7;
+      margin: 0 auto 2rem;
+      max-width: 660px;
+    }
+
+    .section-opal .button {
+      background: var(--bsc-color-labradorite-ink);
+      color: var(--bsc-color-moon-white);
+    }
+
+    @keyframes auroraDrift {
+      from { transform: translate3d(-2%, -1%, 0) scale(1); }
+      to { transform: translate3d(2%, 1%, 0) scale(1.05); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .hero::before { animation: none; }
+    }
+
+    @media (max-width: 900px) {
+      .site-nav { display: none; }
+      .hero-grid,
+      .engine-grid,
+      .visual-band {
+        grid-template-columns: 1fr;
+      }
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        min-height: auto;
+        padding: 5rem 1.25rem;
+      }
+      .section {
+        padding: 3.5rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header" aria-label="AWEN01 site header">
+      <a class="brand" href="#">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">AWEN01</span>
+      </a>
+      <nav class="site-nav" aria-label="Preview navigation">
+        <a href="#why-cycles">Why Cycles</a>
+        <a href="#rule-order">Rule Order</a>
+        <a href="#plugin-fit">Plugin Fit</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <p class="eyebrow">Cyclical Colour Palettes</p>
+            <h1>Schedule colour changes without redesigning the site.</h1>
+            <p class="hero-copy">A GeneratePress and GenerateBlocks companion for date, time, season, holiday, campaign, and daypart palettes. Set the rules once; when schedules overlap, the higher-priority rule decides which colours visitors see.</p>
+            <div class="button-row">
+              <a class="button button-primary" href="#rule-order">See how rule order works</a>
+              <a class="button button-secondary" href="#why-cycles">Why it matters</a>
+            </div>
+          </div>
+          <aside class="rule-stack" aria-label="Active palette priority stack">
+            <p class="rule-stack__label">Tonight's active stack</p>
+            <p class="rule is-active"><strong>Priority 100</strong><br>Holiday palette. Active Dec 21, all day.</p>
+            <p class="rule"><strong>Priority 40</strong><br>Night palette. Active daily from 6 PM to 6 AM.</p>
+            <p class="rule"><strong>Priority 10</strong><br>Winter baseline. Active December through February.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-light" id="why-cycles">
+        <div class="inner">
+          <p class="eyebrow">Why Cycles</p>
+          <h2>Your site can match the moment without anyone rebuilding pages.</h2>
+          <p class="section-copy">Static colour systems are good at consistency. Cyclical colour systems add context. They let a site feel calmer at night, brighter in the morning, more festive on holidays, more urgent during launches, and normal again when the moment passes.</p>
+          <div class="card-grid">
+            <article class="card">
+              <p class="kicker">01 Commerce</p>
+              <h3>Campaigns without redesigns</h3>
+              <p>Launch windows, seasonal sale tones, cart urgency, and post-purchase calm can all use managed palettes.</p>
+            </article>
+            <article class="card">
+              <p class="kicker">02 Holidays</p>
+              <h3>Holidays that outrank routine</h3>
+              <p>A holiday, event, fundraiser, or launch week can override normal day/night colour changes.</p>
+            </article>
+            <article class="card">
+              <p class="kicker">03 Publishing</p>
+              <h3>Editorial moods with rules</h3>
+              <p>Morning briefings, evening essays, archives, and limited series can feel distinct without leaving the brand.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-dark" id="rule-order">
+        <div class="inner">
+          <div class="engine-grid">
+            <div>
+              <p class="eyebrow">Rule Order</p>
+              <h2>When two schedules overlap, the clearer rule wins.</h2>
+              <p class="section-copy">Each palette rule can include a date range, time range, timezone, recurrence pattern, priority number, and scope. The plugin checks which rules are active and applies the highest-priority match to GeneratePress and GenerateBlocks surfaces.</p>
+            </div>
+            <div class="code-panel">
+              <p class="eyebrow">How it works</p>
+              <p><strong>1.</strong> Check the site's timezone and current time.<br><strong>2.</strong> Find colour rules active for this page, post type, or the whole site.<br><strong>3.</strong> If more than one rule applies, use the highest-priority rule.<br><strong>4.</strong> Output the matching CSS variables.<br><strong>5.</strong> Let GeneratePress and GenerateBlocks inherit the active colours.</p>
+            </div>
+          </div>
+          <div class="visual-band">
+            <img src="../assets/nature-source/awen-aurora-pines.jpg" alt="Aurora borealis above pine trees at night">
+            <p class="visual-note">Inside the awen01.cc plugin ecosystem, this becomes another living layer: motion, brand standards, and visible colour systems can move together without hand-editing every block.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-opal" id="plugin-fit">
+        <div class="inner">
+          <p class="eyebrow">Next Plugin Candidate</p>
+          <h2>Make colour scheduled, seasonal, and intentional.</h2>
+          <p class="cta-copy">Cyclical Colour Palettes turns palette changes into governed site behaviour instead of a manual launch-day scramble.</p>
+          <a class="button" href="#">Return to the toolkit</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

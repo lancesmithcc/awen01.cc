@@ -8,8 +8,10 @@ class Stockboss_Options
 {
     public const OPTION_KEY = 'stockboss_options';
     private const SECRET_PREFIX = 'stockboss:v1:';
-    public const MODEL_HIGH_QUALITY = 'google/gemini-3.1-flash-image-preview';
-    public const MODEL_COST_EFFICIENT = 'bytedance-seed/seedream-4.5';
+    // Cutting-edge image models available through OpenRouter.
+    public const MODEL_HIGH_QUALITY = 'openai/gpt-5.4-image-2';        // Top pick.
+    public const MODEL_ALT = 'google/gemini-3-pro-image-preview';      // Alternative high-end.
+    public const MODEL_COST_EFFICIENT = 'bytedance-seed/seedream-4.5'; // Budget.
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class Stockboss_Options
                 'gemini_api_key' => '',
                 'default_model' => self::MODEL_HIGH_QUALITY,
                 'enable_model_fallback' => false,
+                'use_brand_standards' => true,
                 'global_system_prompt' => '',
                 'global_reference_image_ids' => [],
             ]
@@ -52,8 +55,9 @@ class Stockboss_Options
     public function get_available_models(): array
     {
         return [
-            self::MODEL_HIGH_QUALITY => __('Gemini 3.1 Flash Image Preview (Highest Quality)', 'stockboss'),
-            self::MODEL_COST_EFFICIENT => __('Seedream 4.5 (Cost Efficient)', 'stockboss'),
+            self::MODEL_HIGH_QUALITY => __('GPT-5.4 Image 2 — Top pick (Highest Quality)', 'stockboss'),
+            self::MODEL_ALT => __('Gemini 3 Pro Image (Alternative high-end)', 'stockboss'),
+            self::MODEL_COST_EFFICIENT => __('Seedream 4.5 (Budget)', 'stockboss'),
         ];
     }
 
@@ -78,6 +82,7 @@ class Stockboss_Options
             'stockboss_main_section',
             __('Stockboss Provider Keys', 'stockboss'),
             function () {
+                echo '<p>' . esc_html__('Stockboss generates imagery with the most cutting-edge image models available through OpenRouter — GPT-5.4 Image 2 (top pick), Gemini 3 Pro Image, and the budget-friendly Seedream 4.5 — using a single OpenRouter key.', 'stockboss') . '</p>';
                 echo '<p>' . esc_html__('Store image provider keys server-side. Keys are encrypted before being saved in WordPress options and are never exposed to editor JavaScript.', 'stockboss') . '</p>';
             },
             'stockboss'
@@ -141,6 +146,14 @@ class Stockboss_Options
         );
 
         add_settings_field(
+            'use_brand_standards',
+            __('BrandBoss Sync', 'stockboss'),
+            [$this, 'render_use_brand_standards_field'],
+            'stockboss',
+            'stockboss_generation_section'
+        );
+
+        add_settings_field(
             'global_system_prompt',
             __('Global System Prompt', 'stockboss'),
             [$this, 'render_global_system_prompt_field'],
@@ -198,6 +211,7 @@ class Stockboss_Options
         $input_model = isset($input['default_model']) ? sanitize_text_field($input['default_model']) : self::MODEL_HIGH_QUALITY;
         $output['default_model'] = $this->is_valid_model($input_model) ? $input_model : self::MODEL_HIGH_QUALITY;
         $output['enable_model_fallback'] = ! empty($input['enable_model_fallback']);
+        $output['use_brand_standards'] = ! empty($input['use_brand_standards']);
 
         $output['global_system_prompt'] = isset($input['global_system_prompt'])
             ? sanitize_textarea_field($input['global_system_prompt'])
@@ -516,9 +530,27 @@ CSS;
             '<label><input type="checkbox" name="%1$s[enable_model_fallback]" value="1" %2$s /> %3$s</label>',
             esc_attr(self::OPTION_KEY),
             checked($value, true, false),
-            esc_html__('If the default model fails temporarily (e.g. rate-limit), retry with Seedream.', 'stockboss')
+            esc_html__('If the default model fails temporarily (e.g. rate-limit), retry with the budget Seedream 4.5 model.', 'stockboss')
         );
         echo '<p class="stockboss-field-hint">' . esc_html__('Off = strict mode (always use selected default model).', 'stockboss') . '</p>';
+    }
+
+    public function render_use_brand_standards_field(): void
+    {
+        $value = (bool) $this->get('use_brand_standards', true);
+        $active = class_exists('BrandBoss_Bridge') && BrandBoss_Bridge::is_active();
+
+        printf(
+            '<label><input type="checkbox" name="%1$s[use_brand_standards]" value="1" %2$s /> %3$s</label>',
+            esc_attr(self::OPTION_KEY),
+            checked($value, true, false),
+            esc_html__('When BrandBoss is installed, generate against the active brand image standards (style, palette, reference images).', 'stockboss')
+        );
+
+        $status = $active
+            ? __('BrandBoss detected — Stockboss and BrandBoss share the same brand image standards.', 'stockboss')
+            : __('BrandBoss not detected. Stockboss runs standalone using the Global System Prompt below.', 'stockboss');
+        echo '<p class="stockboss-field-hint">' . esc_html($status) . '</p>';
     }
 
     public function render_global_system_prompt_field(): void

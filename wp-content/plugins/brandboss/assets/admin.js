@@ -354,6 +354,7 @@
 		typography: tabTypography,
 		spacing: tabSpacing,
 		imagery: tabImagery,
+		library: tabLibrary,
 		context: tabContext,
 		tone: tabTone,
 		ai: tabAI,
@@ -363,7 +364,7 @@
 		quickstart: '⚡ Quick Start',
 		aiuse: 'AI Use Cases',
 		identity: 'Identity', logos: 'Logos & Lockups', colors: 'Color', typography: 'Typography',
-		spacing: 'Spacing & Layout', imagery: 'Imagery', context: 'In Application', tone: 'Voice & Tone', ai: 'AI & API Keys', export: 'Export & Sync',
+		spacing: 'Spacing & Layout', imagery: 'Imagery', library: 'Asset Library', context: 'In Application', tone: 'Voice & Tone', ai: 'AI & API Keys', export: 'Export & Sync',
 	};
 
 	/** Section on/off pill used by optional sections. */
@@ -609,6 +610,55 @@
 			}, 'Generate' ),
 		] ) );
 		wrap.appendChild( out );
+		return wrap;
+	}
+
+	/* Asset Library — four shared brand image categories. Approved items become
+	   referenced brand standards (brand.json / brand.md) and feed Stockboss. */
+	const LIBRARY_CATEGORIES = [
+		[ 'graphics', 'Graphical Elements' ],
+		[ 'icons', 'Icons' ],
+		[ 'stock', 'Stock Imagery' ],
+		[ 'illustrations', 'Illustrations' ],
+	];
+
+	function tabLibrary() {
+		const wrap = el( 'div' );
+		state.asset_library = state.asset_library || {};
+
+		wrap.appendChild( el( 'p', { class: 'bsc-hint' },
+			'Approved images here are the brand\'s canonical visual assets. They\'re written into brand.json and brand.md, and shared with Stockboss so generated imagery stays on-brand. Stockboss can also push approved generations straight into these categories.' ) );
+
+		LIBRARY_CATEGORIES.forEach( ( [ slug, label ] ) => {
+			state.asset_library[ slug ] = state.asset_library[ slug ] || [];
+			const arr = state.asset_library[ slug ];
+
+			wrap.appendChild( el( 'h3', {}, label ) );
+			const box = el( 'div', { class: 'bsc-cards' } );
+
+			function draw() {
+				box.innerHTML = '';
+				arr.forEach( ( item, i ) => {
+					item.approved = item.approved !== false; // default approved
+					box.appendChild( el( 'div', { class: 'bsc-card' }, [
+						thumb( item.attachment_id ),
+						el( 'button', { class: 'button', type: 'button', onclick: () => mediaPick( ( id ) => { item.attachment_id = id; draw(); } ) }, item.attachment_id ? 'Replace' : 'Choose image' ),
+						field( 'Label', text( item, 'label', { placeholder: label + ' asset' } ) ),
+						field( 'Prompt / note', area( item, 'prompt', 2 ) ),
+						el( 'label', { class: 'bsc-switch' }, [
+							el( 'input', { type: 'checkbox', checked: item.approved !== false, onchange: ( e ) => { item.approved = e.target.checked; } } ),
+							el( 'span', { class: 'bsc-switch-track' }, el( 'span', { class: 'bsc-switch-thumb' } ) ),
+							el( 'span', {}, 'Approved (counts as a brand standard)' ),
+						] ),
+						el( 'button', { class: 'button bsc-x', type: 'button', onclick: () => { arr.splice( i, 1 ); draw(); } }, 'Remove' ),
+					] ) );
+				} );
+				box.appendChild( el( 'button', { class: 'button button-secondary', type: 'button', onclick: () => { arr.push( { attachment_id: 0, label: '', prompt: '', approved: true, source: 'brandboss' } ); draw(); } }, '+ Add ' + label ) );
+			}
+			draw();
+			wrap.appendChild( box );
+		} );
+
 		return wrap;
 	}
 

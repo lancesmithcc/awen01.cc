@@ -18,6 +18,11 @@ class BSC_Rest {
 		return current_user_can( 'manage_options' );
 	}
 
+	/** Editor-level access for the shared image-standards bridge (read + approve). */
+	public static function can_edit() {
+		return current_user_can( 'edit_posts' ) && current_user_can( 'upload_files' );
+	}
+
 	public static function routes() {
 		register_rest_route( self::NS, '/brand', array(
 			array(
@@ -70,6 +75,42 @@ class BSC_Rest {
 			'methods'             => 'POST',
 			'permission_callback' => array( __CLASS__, 'can' ),
 			'callback'            => array( __CLASS__, 'ai_image' ),
+		) );
+
+		// Shared bridge: the active brand image standards. Editor-readable so
+		// companion plugins (Stockboss) can generate against the same rules.
+		register_rest_route( self::NS, '/image-standards', array(
+			'methods'             => 'GET',
+			'permission_callback' => array( __CLASS__, 'can_edit' ),
+			'callback'            => function () {
+				return rest_ensure_response( array(
+					'version'    => BrandBoss_Bridge::VERSION,
+					'categories' => BrandBoss_Bridge::categories(),
+					'standards'  => BrandBoss_Bridge::image_standards(),
+				) );
+			},
+		) );
+
+		// Shared bridge: approve an asset into the brand library.
+		register_rest_route( self::NS, '/library/add', array(
+			'methods'             => 'POST',
+			'permission_callback' => array( __CLASS__, 'can_edit' ),
+			'callback'            => function ( WP_REST_Request $req ) {
+				$item = BrandBoss_Bridge::add_asset(
+					(string) $req->get_param( 'category' ),
+					(int) $req->get_param( 'attachment_id' ),
+					array(
+						'label'  => (string) $req->get_param( 'label' ),
+						'prompt' => (string) $req->get_param( 'prompt' ),
+						'model'  => (string) $req->get_param( 'model' ),
+						'source' => (string) ( $req->get_param( 'source' ) ?: 'brandboss' ),
+					)
+				);
+				if ( is_wp_error( $item ) ) {
+					return $item;
+				}
+				return rest_ensure_response( array( 'ok' => true, 'item' => $item ) );
+			},
 		) );
 	}
 
@@ -132,7 +173,11 @@ class BSC_Rest {
 		$text = $json['choices'][0]['message']['content'] ?? null;
 
 		if ( null === $text ) {
-			return new WP_Error( 'bsc_ai', 'Provider returned no content.', array( 'status' => 502, 'detail' => $json ) );
+			$err = array( 'status' => 502 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$err['detail'] = $json;
+			}
+			return new WP_Error( 'bsc_ai', 'Provider returned no content.', $err );
 		}
 		return rest_ensure_response( array( 'text' => $text ) );
 	}
@@ -154,6 +199,12 @@ class BSC_Rest {
 		$model  = sanitize_text_field( $req->get_param( 'model' ) ?: (
 			'vector' === $kind ? $brand['ai']['fal_vector_model'] : $brand['ai']['fal_raster_model']
 		) );
+		// Harden against host-override / SSRF: $model is concatenated into the
+		// fal.run request URL, so reject anything that could escape the path
+		// (userinfo '@', scheme ':', whitespace, traversal '..').
+		if ( ! preg_match( '#^[a-z0-9][a-z0-9._/-]*$#i', $model ) || false !== strpos( $model, '..' ) ) {
+			return new WP_Error( 'bsc_bad_model', 'Invalid model identifier.', array( 'status' => 400 ) );
+		}
 		$prompt = (string) $req->get_param( 'prompt' );
 
 		$input = array( 'prompt' => $prompt );
@@ -183,7 +234,11 @@ class BSC_Rest {
 		$url  = $json['images'][0]['url'] ?? ( $json['image']['url'] ?? null );
 
 		if ( ! $url ) {
-			return new WP_Error( 'bsc_fal', 'fal.ai returned no image.', array( 'status' => 502, 'detail' => $json ) );
+			$err = array( 'status' => 502 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$err['detail'] = $json;
+			}
+			return new WP_Error( 'bsc_fal', 'fal.ai returned no image.', $err );
 		}
 
 		// Sideload into Media Library.

@@ -24,3 +24,30 @@
 	position: fixed;
 	inset: 0;
 }
+
+/* Text contrast across DLT color modes (light / dark / transcendent).
+   Tile labels sit on dark animated canvases, so they stay light in every mode.
+   Pack group name/description sit on the section surface, so they use the
+   adaptive ink-text token (dark on light & transcendent, light on dark). */
+/* Fixed-dark demo surfaces (animated canvas, gallery stills, config panels):
+   text stays light in every mode. */
+.ultrabgs-host, .ultrabgs-host *,
+.ubgs-tile, .ubgs-tile *,
+.ubgs-still, .ubgs-still *,
+.ubgs-mounted, .ubgs-mounted *,
+.ubgs-sonic, .ubgs-sonic *,
+.ubgs-retro-future, .ubgs-retro-future *,
+.ubgs-luxury, .ubgs-luxury *,
+.ubgs-elemental, .ubgs-elemental *,
+.ubgs-ascii-art, .ubgs-ascii-art *,
+.ubgs-config, .ubgs-config * {
+	color: var(--wp--preset--color--moon-white) !important;
+}
+
+/* Pack name/description sit on the adaptive section surface: ink-text adapts
+   (dark on light & transcendent, light on dark). !important beats the DLT
+   per-block text-inherit override. */
+.ubgs-pack-group__name,
+.ubgs-pack-group__desc {
+	color: var(--wp--preset--color--ink-text) !important;
+}

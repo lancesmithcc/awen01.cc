@@ -56,6 +56,14 @@ class BSC_Export {
 			(array) ( $brand['imagery']['examples'] ?? array() )
 		) ) );
 
+		// Resolve every brand-library asset to a URL so the JSON is a complete,
+		// machine-readable index of approved brand imagery by category.
+		foreach ( (array) ( $out['asset_library'] ?? array() ) as $cat => $items ) {
+			foreach ( (array) $items as $i => $item ) {
+				$out['asset_library'][ $cat ][ $i ]['url'] = BSC_Brand::asset_url( $item['attachment_id'] ?? 0 );
+			}
+		}
+
 		// Computed: contrast matrix + resolved type scale.
 		$out['computed'] = array(
 			'contrast_matrix' => BSC_Contrast::matrix( (array) $brand['colors'] ),
@@ -191,6 +199,47 @@ class BSC_Export {
 			$u = BSC_Brand::asset_url( $id );
 			if ( $u ) {
 				$md .= '- Reference image: ' . $u . $nl;
+			}
+		}
+
+		// Brand asset library — approved, categorized imagery the model may reuse.
+		$cats = class_exists( 'BrandBoss_Bridge' ) ? BrandBoss_Bridge::categories() : array(
+			'graphics' => 'Graphical Elements', 'icons' => 'Icons', 'stock' => 'Stock Imagery', 'illustrations' => 'Illustrations',
+		);
+		$library = (array) ( $b['asset_library'] ?? array() );
+		$has_assets = false;
+		foreach ( $cats as $slug => $label ) {
+			if ( ! empty( $library[ $slug ] ) ) {
+				$has_assets = true;
+				break;
+			}
+		}
+		if ( $has_assets ) {
+			$md .= $nl . '## Brand Asset Library' . $nl . $nl;
+			$md .= 'Approved, on-brand imagery. Reuse these directly; match their treatment when generating new assets.' . $nl;
+			foreach ( $cats as $slug => $label ) {
+				$items = (array) ( $library[ $slug ] ?? array() );
+				if ( empty( $items ) ) {
+					continue;
+				}
+				$md .= $nl . '### ' . $label . $nl;
+				foreach ( $items as $item ) {
+					if ( empty( $item['approved'] ) ) {
+						continue;
+					}
+					$u = BSC_Brand::asset_url( $item['attachment_id'] ?? 0 );
+					if ( ! $u ) {
+						continue;
+					}
+					$line = '- **' . ( $item['label'] ?? 'Asset' ) . '**: ' . $u;
+					if ( ! empty( $item['prompt'] ) ) {
+						$line .= ' — prompt: ' . str_replace( "\n", ' ', $item['prompt'] );
+					}
+					if ( ! empty( $item['model'] ) ) {
+						$line .= ' — model: ' . $item['model'];
+					}
+					$md .= $line . $nl;
+				}
 			}
 		}
 

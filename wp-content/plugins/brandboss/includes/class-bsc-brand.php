@@ -83,6 +83,15 @@ class BSC_Brand {
 				'treatments' => '',
 				'examples'   => array(), // attachment IDs
 			),
+			'asset_library' => array(
+				// Four shared brand image categories. Each item:
+				// { attachment_id, label, prompt, model, source, approved, added }
+				// Approved items become referenced brand standards (brand.json/brand.md).
+				'graphics'      => array(), // graphical elements
+				'icons'         => array(),
+				'stock'         => array(), // stock imagery
+				'illustrations' => array(),
+			),
 			'tone'       => array(
 				'enabled'    => false,
 				'attributes' => array(), // e.g. "warm", "direct"
@@ -150,7 +159,7 @@ class BSC_Brand {
 			$hex = sanitize_hex_color( $value );
 			return $hex ? $hex : '#000000';
 		}
-		if ( in_array( $key, array( 'mission', 'notes', 'style', 'guidelines', 'treatments', 'usage' ), true ) ) {
+		if ( in_array( $key, array( 'mission', 'notes', 'style', 'guidelines', 'treatments', 'usage', 'prompt' ), true ) ) {
 			return sanitize_textarea_field( $value );
 		}
 		if ( 'url' === $key ) {

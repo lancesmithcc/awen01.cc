@@ -66,6 +66,26 @@ The tokens.css layer works on **any** theme, so GB elements can also use `var(--
 - `POST /wp-json/bsc/v1/ai/text` — `{provider, model, prompt}` → OpenAI-compatible chat completions against OpenRouter, DeepSeek, or MiniMax. Used by the "Draft with AI" buttons (mission, logo dos/don'ts, tone guidelines) and available for your own tooling.
 - `POST /wp-json/bsc/v1/ai/image` — `{kind: vector|raster, prompt}` → fal.ai synchronous run. Vector defaults to `fal-ai/recraft/v3/text-to-image`; raster defaults to the GPT Image endpoint (model strings are editable in **AI & API Keys**, so point the raster model at GPT Image 2 the moment fal exposes it). Results are sideloaded into the Media Library.
 
+## Brand Asset Library + Stockboss bridge
+
+The **Asset Library** tab holds the brand's canonical imagery in four shared
+categories: **Graphical Elements, Icons, Stock Imagery, Illustrations**. Items
+marked *approved* become brand standards — they're resolved and listed in
+`brand.json` (`asset_library`) and `brand.md` (a "Brand Asset Library" section
+with direct URLs) so downstream AI can reuse them directly.
+
+`BrandBoss_Bridge` is the stable, shared contract that companion plugins use.
+[Stockboss](../stockboss/README.md) consumes it to generate against the live
+brand image standards and to push approved generations straight into a category
+— no copy/paste, never out of sync. BrandBoss and Stockboss each run fully
+independently; the bridge is a no-op when the other plugin is absent.
+
+- `BrandBoss_Bridge::is_active()` / `::categories()` / `::image_standards()` / `::add_asset( $cat, $id, $args )`
+- `GET  /wp-json/bsc/v1/image-standards` — version, categories, and the active standards (editor-readable).
+- `POST /wp-json/bsc/v1/library/add` — `{category, attachment_id, label?, prompt?, model?, source?}`.
+- `do_action( 'brandboss/asset_approved', $attachment_id, $category, $item )`
+- `apply_filters( 'brandboss/image_standards', $standards, $brand )` / `apply_filters( 'brandboss/categories', $cats )`
+
 ## Install
 
 1. Zip/upload the `brandboss` folder to `/wp-content/plugins/` and activate.

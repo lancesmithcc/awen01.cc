@@ -3,7 +3,7 @@
  * Plugin Name:       BrandBoss
  * Plugin URI:        https://awen01.cc/brandboss/
  * Description:       Build a complete machine-readable brand system — colors, typography, spacing, logo treatment, imagery and tone — with GeneratePress/GenerateBlocks sync, AI-assisted generation (OpenRouter / DeepSeek / MiniMax / fal.ai), a live guide page, and JSON / Markdown / PDF exports for both humans and AI agents.
- * Version:           0.9.3
+ * Version:           0.10.0
  * Author:            AWEN01
  * Author URI:        https://awen01.cc/
  * License:           GPL-2.0-or-later
@@ -13,13 +13,14 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BSC_VERSION', '0.9.3' );
+define( 'BSC_VERSION', '0.10.0' );
 define( 'BSC_FILE', __FILE__ );
 define( 'BSC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BSC_URL', plugin_dir_url( __FILE__ ) );
 
 require_once BSC_DIR . 'includes/class-bsc-keys.php';
 require_once BSC_DIR . 'includes/class-bsc-brand.php';
+require_once BSC_DIR . 'includes/class-brandboss-bridge.php';
 require_once BSC_DIR . 'includes/class-bsc-contrast.php';
 require_once BSC_DIR . 'includes/class-bsc-color.php';
 require_once BSC_DIR . 'includes/class-bsc-principles.php';

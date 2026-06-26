@@ -76,6 +76,9 @@ body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var
 .awen-photo-hero--ultrabgs::before{background-image:url('/wp-content/uploads/2026/06/awen-hero-mountain-lake.jpg')}
 .awen-photo-hero--dawn::before{background-image:url('/wp-content/uploads/2026/06/awen-hero-forest-rays.jpg')}
 .awen-photo-hero--stockboss::before{background-image:url('/wp-content/uploads/2026/06/pexels-photo-11858855.jpeg')}
+.awen-photo-hero--dlt::before{background-image:url('/wp-content/uploads/2026/06/awen-dlt-dark-aurora.jpg')}
+.awen-photo-hero--dlt-fog::before{background-image:url('/wp-content/uploads/2026/06/awen-dlt-trans-fog.jpg')}
+.awen-photo-hero--dlt-fog::after{background:linear-gradient(180deg,rgba(8,17,15,.78) 0%,rgba(8,17,15,.62) 50%,rgba(8,17,15,.82) 100%)}
 .awen-photo-hero--home{min-height:78vh}
 .awen-photo-hero--home .gb-text-hero003,.awen-photo-hero--home .gb-text-hero004,.awen-photo-hero--home .gb-text-hero005{color:var(--bsc-color-moon-white,#f7f8fb)!important;text-shadow:0 2px 24px rgba(0,0,0,.36)}
 .awen-photo-hero--home .gb-text-hero005{color:rgba(247,248,251,.82)!important}
@@ -213,3 +216,22 @@ body.awen01-brand{background:var(--awen-bg);color:var(--awen-fg);font-family:var
 .awen-c2-prev svg,.awen-c2-next svg{width:22px;height:22px}
 @media(max-width:860px){.awen-c2-prev{left:2px}.awen-c2-next{right:2px}}
 @media(prefers-reduced-motion:reduce){.awen-c2-viewport{scroll-behavior:auto}}
+/* ===== Dark Light Transcendent feature page (page 527) ===== */
+/* Mode-correct contrast: use semantic awen tokens so ground/text invert per mode */
+.gb-element-dlt100,.gb-element-dlt300,.gb-element-dlt600{background-color:var(--awen-bg)!important}
+.gb-text-dlt102,.gb-text-dlt302{color:var(--awen-accent)!important}
+.gb-text-dlt103,.gb-text-dlt303,.gb-text-dlt602{color:var(--awen-fg)!important}
+.gb-text-dlt104,.gb-text-dlt304{color:var(--awen-muted)!important}
+/* How-it-works cards -> panel surface + readable text every mode */
+.gb-element-dlt311,.gb-element-dlt312,.gb-element-dlt313,.gb-element-dlt314,.gb-element-dlt315,.gb-element-dlt316{background-color:var(--awen-panel)!important;border:1px solid color-mix(in srgb,var(--awen-fg) 12%,transparent)}
+.gb-text-dlt311a,.gb-text-dlt312a,.gb-text-dlt313a,.gb-text-dlt314a,.gb-text-dlt315a,.gb-text-dlt316a{color:var(--awen-fg)!important}
+.gb-text-dlt311b,.gb-text-dlt312b,.gb-text-dlt313b,.gb-text-dlt314b,.gb-text-dlt315b,.gb-text-dlt316b{color:var(--awen-fg)!important;opacity:.82}
+.gb-text-dlt313b code{background:color-mix(in srgb,var(--awen-accent) 16%,transparent);border-radius:4px;color:var(--awen-fg);padding:.06em .4em}
+/* Footer band button */
+.gb-text-dlt603{background-color:var(--awen-accent)!important;color:var(--awen-bg)!important}
+/* ultrabgs visibility: lift hero node-matrix above photo overlay, brighten */
+.gb-element-dlt001 .awen-ultrabgs-overlay{z-index:4!important}
+.gb-element-dlt001 .awen-ultrabgs-overlay>.ultrabgs-canvas{opacity:.92!important;mix-blend-mode:screen}
+/* ultrabgs aurora showcase band (tokens section) — make the canvas the star */
+.gb-element-dlt400>.ultrabgs-canvas{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important;opacity:.9;mix-blend-mode:screen}
+.gb-element-dlt400>:not(.ultrabgs-canvas){position:relative;z-index:2}

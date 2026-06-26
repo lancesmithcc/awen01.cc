@@ -5,13 +5,23 @@
     const { addFilter } = wp.hooks;
     const { createHigherOrderComponent } = wp.compose;
     const { MediaUpload, MediaUploadCheck, useBlockProps, InspectorControls } = wp.blockEditor;
-    const { TextareaControl, Button, Notice, Spinner, PanelBody, ToggleControl } = wp.components;
+    const { TextareaControl, Button, Notice, Spinner, PanelBody, ToggleControl, SelectControl } = wp.components;
     const { useSelect } = wp.data;
     const apiFetch = wp.apiFetch;
 
     const config = window.StockbossConfig || {
         restPath: '/stockboss/v1/generate-image',
+        brandLibraryPath: '/stockboss/v1/add-to-brand-library',
+        brandBossActive: false,
+        brandCategories: {},
     };
+
+    function brandCategoryOptions() {
+        const cats = config.brandCategories || {};
+        return Object.keys(cats).map(function (slug) {
+            return { value: slug, label: cats[slug] };
+        });
+    }
 
     function getSuccessMessage(response) {
         if (response && response.fallbackUsed && response.modelUsed) {
@@ -352,6 +362,51 @@
                 const [isIterating, setIsIterating] = useState(false);
                 const [error, setError] = useState('');
 
+                const brandOptions = brandCategoryOptions();
+                const brandActive = !!config.brandBossActive && brandOptions.length > 0;
+                const [brandCategory, setBrandCategory] = useState(brandOptions.length ? brandOptions[0].value : '');
+                const [isSavingBrand, setIsSavingBrand] = useState(false);
+                const [brandError, setBrandError] = useState('');
+
+                function addToBrandLibrary() {
+                    setBrandError('');
+
+                    if (!imageId) {
+                        setBrandError(__('Save the image to the Media Library before adding it to the brand library.', 'stockboss'));
+                        return;
+                    }
+                    if (!brandCategory) {
+                        setBrandError(__('Choose a brand asset category first.', 'stockboss'));
+                        return;
+                    }
+
+                    setIsSavingBrand(true);
+
+                    apiFetch({
+                        path: config.brandLibraryPath,
+                        method: 'POST',
+                        data: {
+                            attachmentId: imageId,
+                            category: brandCategory,
+                            prompt: iterationPrompt || (props.attributes && props.attributes.alt) || '',
+                        },
+                    })
+                        .then(function () {
+                            wp.data.dispatch('core/notices').createNotice(
+                                'success',
+                                __('Added to the brand library — this asset is now part of the brand standards.', 'stockboss'),
+                                { type: 'snackbar' }
+                            );
+                        })
+                        .catch(function (requestError) {
+                            const fallback = __('Could not add image to the brand library.', 'stockboss');
+                            setBrandError(requestError && requestError.message ? requestError.message : fallback);
+                        })
+                        .finally(function () {
+                            setIsSavingBrand(false);
+                        });
+                }
+
                 function iterateImage() {
                     setError('');
 
@@ -480,7 +535,56 @@
                                               : __('Iterate Image', 'stockboss')
                                       )
                                   )
-                              )
+                              ),
+                              brandActive
+                                  ? wp.element.createElement(
+                                        PanelBody,
+                                        {
+                                            title: __('Add to Brand Library', 'stockboss'),
+                                            initialOpen: false,
+                                        },
+                                        wp.element.createElement(
+                                            'div',
+                                            { className: 'stockboss-iterate-panel' },
+                                            wp.element.createElement(
+                                                'p',
+                                                { className: 'stockboss-brand-help' },
+                                                __('Approve this image into the shared BrandBoss library. Approved assets become brand standards and are referenced in the machine-readable brand.md / brand.json.', 'stockboss')
+                                            ),
+                                            wp.element.createElement(SelectControl, {
+                                                __nextHasNoMarginBottom: true,
+                                                label: __('Category', 'stockboss'),
+                                                value: brandCategory,
+                                                options: brandOptions,
+                                                onChange: setBrandCategory,
+                                            }),
+                                            brandError
+                                                ? wp.element.createElement(Notice, {
+                                                      status: 'error',
+                                                      isDismissible: false,
+                                                      children: brandError,
+                                                  })
+                                                : null,
+                                            wp.element.createElement(
+                                                Button,
+                                                {
+                                                    variant: 'primary',
+                                                    className: 'stockboss-hover-item',
+                                                    onClick: addToBrandLibrary,
+                                                    disabled: isSavingBrand || !imageId,
+                                                },
+                                                isSavingBrand
+                                                    ? wp.element.createElement(
+                                                          Fragment,
+                                                          null,
+                                                          wp.element.createElement(Spinner, null),
+                                                          wp.element.createElement('span', null, __('Adding...', 'stockboss'))
+                                                      )
+                                                    : __('Add to Brand Library', 'stockboss')
+                                            )
+                                        )
+                                    )
+                                  : null
                           )
                         : null
                 );

@@ -1,0 +1,67 @@
+[
+  {
+    "key": "awen-aurora-pines",
+    "provider": "Pexels",
+    "id": "16747790",
+    "photographer": "Stijn Dijkstra",
+    "page": "https://www.pexels.com/photo/low-angle-view-of-trees-and-aurora-borealis-in-the-sky-16747790/",
+    "url": "https://images.pexels.com/photos/16747790/pexels-photo-16747790.jpeg?auto=compress&cs=tinysrgb&w=2200",
+    "alt": "Aurora borealis glowing above tall pine trees at night",
+    "role": "Home feature image and natural aurora mood",
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/nature-source/awen-aurora-pines.jpg",
+    "wordpress": {
+      "attachmentId": 154,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-aurora-pines.jpg"
+    },
+    "bytes": 434514
+  },
+  {
+    "key": "awen-moss-ruins",
+    "provider": "Unsplash",
+    "id": "qg1NSLzZM-k",
+    "photographer": "J Murdoch",
+    "page": "https://unsplash.com/photos/moss-covered-stone-ruins-in-a-forest-setting-qg1NSLzZM-k",
+    "url": "https://images.unsplash.com/photo-1771006277356-a8f5272bd417?auto=format&fit=crop&w=2200&q=85",
+    "downloadLocation": "https://api.unsplash.com/photos/qg1NSLzZM-k/download?ixid=M3w4OTQ4NDN8MHwxfHNlYXJjaHw0fHxtaXN0eSUyMGFuY2llbnQlMjBmb3Jlc3QlMjBtb3NzfGVufDF8MHx8fDE3ODE0NTk2NjN8MA",
+    "alt": "Moss-covered stone ruins in a quiet forest",
+    "role": "Brand Standards Creator machine-readable old-ways/new-tools section",
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/nature-source/awen-moss-ruins.jpg",
+    "wordpress": {
+      "attachmentId": 155,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-moss-ruins.jpg"
+    },
+    "bytes": 810560
+  },
+  {
+    "key": "awen-moss-stream",
+    "provider": "Pexels",
+    "id": "35741015",
+    "photographer": "David J. Boozer",
+    "page": "https://www.pexels.com/photo/serene-forest-stream-in-lush-woodland-setting-35741015/",
+    "url": "https://images.pexels.com/photos/35741015/pexels-photo-35741015.jpeg?auto=compress&cs=tinysrgb&w=2200",
+    "alt": "Calm forest stream flowing through lush woodland",
+    "role": "UltraBGs motion/nature visual interest",
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/nature-source/awen-moss-stream.jpg",
+    "wordpress": {
+      "attachmentId": 156,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-moss-stream.jpg"
+    },
+    "bytes": 1152970
+  },
+  {
+    "key": "awen-bc-foggy-lake",
+    "provider": "Pexels",
+    "id": "11684336",
+    "photographer": "Jay Ngai",
+    "page": "https://www.pexels.com/photo/photo-of-lake-by-the-mountain-11684336/",
+    "url": "https://images.pexels.com/photos/11684336/pexels-photo-11684336.jpeg?auto=compress&cs=tinysrgb&w=2200",
+    "alt": "Foggy mountain lake in British Columbia",
+    "role": "Transcendent threshold imagery for home and site CTA",
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/nature-source/awen-bc-foggy-lake.jpg",
+    "wordpress": {
+      "attachmentId": 157,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-bc-foggy-lake.jpg"
+    },
+    "bytes": 151518
+  }
+]

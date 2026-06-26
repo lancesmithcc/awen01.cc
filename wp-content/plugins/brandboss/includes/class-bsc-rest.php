@@ -18,6 +18,11 @@ class BSC_Rest {
 		return current_user_can( 'manage_options' );
 	}
 
+	/** Editor-level access for the shared image-standards bridge (read + approve). */
+	public static function can_edit() {
+		return current_user_can( 'edit_posts' ) && current_user_can( 'upload_files' );
+	}
+
 	public static function routes() {
 		register_rest_route( self::NS, '/brand', array(
 			array(
@@ -70,6 +75,42 @@ class BSC_Rest {
 			'methods'             => 'POST',
 			'permission_callback' => array( __CLASS__, 'can' ),
 			'callback'            => array( __CLASS__, 'ai_image' ),
+		) );
+
+		// Shared bridge: the active brand image standards. Editor-readable so
+		// companion plugins (Stockboss) can generate against the same rules.
+		register_rest_route( self::NS, '/image-standards', array(
+			'methods'             => 'GET',
+			'permission_callback' => array( __CLASS__, 'can_edit' ),
+			'callback'            => function () {
+				return rest_ensure_response( array(
+					'version'    => BrandBoss_Bridge::VERSION,
+					'categories' => BrandBoss_Bridge::categories(),
+					'standards'  => BrandBoss_Bridge::image_standards(),
+				) );
+			},
+		) );
+
+		// Shared bridge: approve an asset into the brand library.
+		register_rest_route( self::NS, '/library/add', array(
+			'methods'             => 'POST',
+			'permission_callback' => array( __CLASS__, 'can_edit' ),
+			'callback'            => function ( WP_REST_Request $req ) {
+				$item = BrandBoss_Bridge::add_asset(
+					(string) $req->get_param( 'category' ),
+					(int) $req->get_param( 'attachment_id' ),
+					array(
+						'label'  => (string) $req->get_param( 'label' ),
+						'prompt' => (string) $req->get_param( 'prompt' ),
+						'model'  => (string) $req->get_param( 'model' ),
+						'source' => (string) ( $req->get_param( 'source' ) ?: 'brandboss' ),
+					)
+				);
+				if ( is_wp_error( $item ) ) {
+					return $item;
+				}
+				return rest_ensure_response( array( 'ok' => true, 'item' => $item ) );
+			},
 		) );
 	}
 

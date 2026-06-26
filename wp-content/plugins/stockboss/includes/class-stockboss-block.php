@@ -38,6 +38,12 @@ class Stockboss_Block
             'StockbossConfig',
             [
                 'restPath' => '/stockboss/v1/generate-image',
+                'brandStatusPath' => '/stockboss/v1/brand-status',
+                'brandLibraryPath' => '/stockboss/v1/add-to-brand-library',
+                'brandBossActive' => class_exists('BrandBoss_Bridge') && BrandBoss_Bridge::is_active(),
+                'brandCategories' => (class_exists('BrandBoss_Bridge') && BrandBoss_Bridge::is_active())
+                    ? BrandBoss_Bridge::categories()
+                    : (object) [],
             ]
         );
 

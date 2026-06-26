@@ -42,6 +42,20 @@ class Stockboss_OpenRouter
         $user_reference_ids = $this->normalize_ids($args['referenceImageIds'] ?? []);
         $system_reference_ids = $this->normalize_ids($args['systemReferenceImageIds'] ?? []);
 
+        // Sync with BrandBoss when present: the active brand image standards
+        // (style, palette, reference images) drive standardized generations so
+        // Stockboss and BrandBoss stay perfectly in sync. Stockboss still works
+        // standalone — this is a no-op when BrandBoss is not installed.
+        $brand = $this->brand_standards($use_custom_system_prompt);
+        if ($brand !== null) {
+            if ($brand['style'] !== '') {
+                $system_prompt = $system_prompt !== ''
+                    ? $brand['style'] . "\n\n" . $system_prompt
+                    : $brand['style'];
+            }
+            $system_reference_ids = array_merge($system_reference_ids, $brand['reference_ids']);
+        }
+
         $all_user_reference_ids = array_values(array_unique(array_merge($global_reference_ids, $user_reference_ids)));
         $all_system_reference_ids = array_values(array_unique($system_reference_ids));
 
@@ -256,6 +270,34 @@ class Stockboss_OpenRouter
         return "Generate one polished stock-ready image that follows the provided system style guidance and references. Return only the generated image output. Prompt: {$prompt}";
     }
 
+    /**
+     * Pull the active BrandBoss image standards through the shared bridge.
+     * Returns null when BrandBoss is absent, sync is disabled, or the editor
+     * supplied a custom per-block system prompt (explicit override wins).
+     */
+    private function brand_standards(bool $use_custom_system_prompt): ?array
+    {
+        if ($use_custom_system_prompt) {
+            return null;
+        }
+        if (! (bool) $this->options->get('use_brand_standards', true)) {
+            return null;
+        }
+        if (! class_exists('BrandBoss_Bridge') || ! BrandBoss_Bridge::is_active()) {
+            return null;
+        }
+
+        $std = BrandBoss_Bridge::image_standards();
+        if (! is_array($std)) {
+            return null;
+        }
+
+        return [
+            'style'         => isset($std['prompt']) ? trim((string) $std['prompt']) : '',
+            'reference_ids' => $this->normalize_ids($std['reference_image_ids'] ?? []),
+        ];
+    }
+
     private function normalize_ids($ids): array
     {
         if (! is_array($ids)) {
@@ -371,8 +413,9 @@ class Stockboss_OpenRouter
             return $models;
         }
 
+        // Any non-budget model falls back to the budget Seedream model.
         if (
-            $requested_model === Stockboss_Options::MODEL_HIGH_QUALITY &&
+            $requested_model !== Stockboss_Options::MODEL_COST_EFFICIENT &&
             $this->options->is_valid_model(Stockboss_Options::MODEL_COST_EFFICIENT)
         ) {
             $models[] = Stockboss_Options::MODEL_COST_EFFICIENT;

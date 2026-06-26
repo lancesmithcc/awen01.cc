@@ -42,6 +42,20 @@ class Stockboss_OpenRouter
         $user_reference_ids = $this->normalize_ids($args['referenceImageIds'] ?? []);
         $system_reference_ids = $this->normalize_ids($args['systemReferenceImageIds'] ?? []);
 
+        // Sync with BrandBoss when present: the active brand image standards
+        // (style, palette, reference images) drive standardized generations so
+        // Stockboss and BrandBoss stay perfectly in sync. Stockboss still works
+        // standalone — this is a no-op when BrandBoss is not installed.
+        $brand = $this->brand_standards($use_custom_system_prompt);
+        if ($brand !== null) {
+            if ($brand['style'] !== '') {
+                $system_prompt = $system_prompt !== ''
+                    ? $brand['style'] . "\n\n" . $system_prompt
+                    : $brand['style'];
+            }
+            $system_reference_ids = array_merge($system_reference_ids, $brand['reference_ids']);
+        }
+
         $all_user_reference_ids = array_values(array_unique(array_merge($global_reference_ids, $user_reference_ids)));
         $all_system_reference_ids = array_values(array_unique($system_reference_ids));
 
@@ -256,6 +270,34 @@ class Stockboss_OpenRouter
         return "Generate one polished stock-ready image that follows the provided system style guidance and references. Return only the generated image output. Prompt: {$prompt}";
     }
 
+    /**
+     * Pull the active BrandBoss image standards through the shared bridge.
+     * Returns null when BrandBoss is absent, sync is disabled, or the editor
+     * supplied a custom per-block system prompt (explicit override wins).
+     */
+    private function brand_standards(bool $use_custom_system_prompt): ?array
+    {
+        if ($use_custom_system_prompt) {
+            return null;
+        }
+        if (! (bool) $this->options->get('use_brand_standards', true)) {
+            return null;
+        }
+        if (! class_exists('BrandBoss_Bridge') || ! BrandBoss_Bridge::is_active()) {
+            return null;
+        }
+
+        $std = BrandBoss_Bridge::image_standards();
+        if (! is_array($std)) {
+            return null;
+        }
+
+        return [
+            'style'         => isset($std['prompt']) ? trim((string) $std['prompt']) : '',
+            'reference_ids' => $this->normalize_ids($std['reference_image_ids'] ?? []),
+        ];
+    }
+
     private function normalize_ids($ids): array
     {
         if (! is_array($ids)) {
@@ -268,6 +310,11 @@ class Stockboss_OpenRouter
 
     private function attachment_to_data_url(int $attachment_id): ?string
     {
+        // Only allow reference images the current user is permitted to read.
+        if (get_post_type($attachment_id) !== 'attachment' || ! current_user_can('read_post', $attachment_id)) {
+            return null;
+        }
+
         $file_path = get_attached_file($attachment_id);
 
         if (! $file_path || ! file_exists($file_path)) {
@@ -366,8 +413,9 @@ class Stockboss_OpenRouter
             return $models;
         }
 
+        // Any non-budget model falls back to the budget Seedream model.
         if (
-            $requested_model === Stockboss_Options::MODEL_HIGH_QUALITY &&
+            $requested_model !== Stockboss_Options::MODEL_COST_EFFICIENT &&
             $this->options->is_valid_model(Stockboss_Options::MODEL_COST_EFFICIENT)
         ) {
             $models[] = Stockboss_Options::MODEL_COST_EFFICIENT;
@@ -447,6 +495,55 @@ class Stockboss_OpenRouter
             'type' => 'url',
             'data' => $image_url,
         ];
+    }
+
+    /**
+     * Guard download_url() against SSRF: require https and reject any host that
+     * resolves to a private, loopback, or link-local address.
+     */
+    private function is_safe_remote_url(string $url): bool
+    {
+        $parts = wp_parse_url($url);
+        if (! is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
+            return false;
+        }
+        if (strtolower($parts['scheme']) !== 'https') {
+            return false;
+        }
+
+        $host = $parts['host'];
+        $ips  = [];
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips[] = $host;
+        } else {
+            $records = @dns_get_record($host, DNS_A + DNS_AAAA);
+            if (is_array($records)) {
+                foreach ($records as $r) {
+                    if (! empty($r['ip'])) {
+                        $ips[] = $r['ip'];
+                    }
+                    if (! empty($r['ipv6'])) {
+                        $ips[] = $r['ipv6'];
+                    }
+                }
+            }
+            // If DNS resolution failed, refuse rather than trust an unknown host.
+            if (empty($ips)) {
+                return false;
+            }
+        }
+
+        foreach ($ips as $ip) {
+            if (! filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            )) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function extract_openrouter_error_message(array $decoded, int $status_code): string
@@ -530,6 +627,9 @@ class Stockboss_OpenRouter
         $temp_file = null;
 
         if ($image_payload['type'] === 'url') {
+            if (! $this->is_safe_remote_url((string) $image_payload['data'])) {
+                return new WP_Error('stockboss_unsafe_url', __('Generated image URL is not allowed.', 'stockboss'), ['status' => 400]);
+            }
             $temp_file = download_url($image_payload['data']);
             if (is_wp_error($temp_file)) {
                 return new WP_Error('stockboss_download_error', $temp_file->get_error_message(), ['status' => 500]);

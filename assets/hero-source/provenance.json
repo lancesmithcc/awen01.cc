@@ -1,0 +1,74 @@
+[
+  {
+    "key": "awen-hero-ancient-tree",
+    "id": "32235395",
+    "role": "Full-width old-ways / druidic hero band",
+    "provider": "Pexels",
+    "photographer": "Gáspár Ferenc",
+    "page": "https://www.pexels.com/photo/mysterious-ancient-tree-in-madeira-forest-32235395/",
+    "url": "https://images.pexels.com/photos/32235395/pexels-photo-32235395.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "alt": "Ancient tree with twisted branches in the misty Fanal Forest, Madeira.",
+    "width": 6240,
+    "height": 4160,
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/hero-source/awen-hero-ancient-tree.jpg",
+    "bytes": 758554,
+    "wordpress": {
+      "attachmentId": 161,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-hero-ancient-tree.jpg"
+    }
+  },
+  {
+    "key": "awen-hero-starry-forest",
+    "id": "33313322",
+    "role": "Full-width night signal / constellation hero band",
+    "provider": "Pexels",
+    "photographer": "David Paul",
+    "page": "https://www.pexels.com/photo/stunning-night-sky-over-flagstaff-arizona-forest-33313322/",
+    "url": "https://images.pexels.com/photos/33313322/pexels-photo-33313322.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "alt": "Breathtaking view of the Milky Way galaxy above a forest in Flagstaff, Arizona at night.",
+    "width": 8256,
+    "height": 5504,
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/hero-source/awen-hero-starry-forest.jpg",
+    "bytes": 568825,
+    "wordpress": {
+      "attachmentId": 162,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-hero-starry-forest.jpg"
+    }
+  },
+  {
+    "key": "awen-hero-mountain-lake",
+    "id": "7339377",
+    "role": "Full-width transcendent threshold hero band",
+    "provider": "Pexels",
+    "photographer": "Maximilian  Oeverhaus",
+    "page": "https://www.pexels.com/photo/calm-body-of-water-near-mountain-7339377/",
+    "url": "https://images.pexels.com/photos/7339377/pexels-photo-7339377.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "alt": "Serene landscape of a tranquil lake surrounded by misty mountains and lush forest.",
+    "width": 6000,
+    "height": 4000,
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/hero-source/awen-hero-mountain-lake.jpg",
+    "bytes": 463062,
+    "wordpress": {
+      "attachmentId": 163,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-hero-mountain-lake.jpg"
+    }
+  },
+  {
+    "key": "awen-hero-forest-rays",
+    "id": "27794488",
+    "role": "Full-width light-mode dawn / wisdom hero band",
+    "provider": "Pexels",
+    "photographer": "Karel Drozda",
+    "page": "https://www.pexels.com/photo/slunce-v-lese-27794488/",
+    "url": "https://images.pexels.com/photos/27794488/pexels-photo-27794488.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "alt": "Captivating sunbeams piercing through a misty forest, creating a serene atmosphere.",
+    "width": 6144,
+    "height": 4098,
+    "localPath": "/Users/lancesmithcc/storagearea/AWEN01.cc/assets/hero-source/awen-hero-forest-rays.jpg",
+    "bytes": 428360,
+    "wordpress": {
+      "attachmentId": 164,
+      "url": "http://localhost:8091/wp-content/uploads/2026/06/awen-hero-forest-rays.jpg"
+    }
+  }
+]
