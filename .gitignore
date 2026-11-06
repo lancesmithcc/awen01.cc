@@ -42,3 +42,6 @@ plugins-to-sell/**/.git/
 # Plugins (post-rename paths)
 plugins/GX-PixelPusher/
 plugins/**/.git/
+
+# Rust / WASM build artifacts
+wasm/target/

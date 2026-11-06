@@ -177,6 +177,17 @@ tr:hover .bsc-pair { transform: scale(1.15); }
 }
 .bsc-qs-seed input[type="color"]:hover { transform: scale(1.07); box-shadow: 0 4px 14px rgba(0, 0, 0, .18); }
 
+/* live WASM palette preview */
+.bsc-qs-preview { margin: 6px 0 18px; }
+.bsc-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+.bsc-mini-swatch { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; width: 56px; }
+.bsc-mini-swatch-chip {
+	width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, .12);
+	transition: transform .2s var(--bsca-ease), box-shadow .2s;
+}
+.bsc-mini-swatch:hover .bsc-mini-swatch-chip { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+.bsc-mini-swatch-label { font-size: 10px; color: #78716c; line-height: 1.1; text-align: center; word-break: break-word; }
+
 /* ----------------------------------------------------------- gen / ai */
 .bsc-ai-btn { margin-top: 4px; }
 .bsc-gen { display: grid; gap: 10px; max-width: 540px; }

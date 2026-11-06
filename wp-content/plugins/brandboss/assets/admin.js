@@ -10,6 +10,16 @@
 	/* Quick Start scratch state (not part of the brand object until extrapolated). */
 	const qs = { logo_attachment_id: 0, logo_url: '', seeds: [ '#2f6feb' ], heading_font: '', body_font: '', vibe: [ '', '', '' ], industry: '', strategy: 'committed' };
 
+	/* WASM color engine — optional. Loaded async; when present it powers the
+	   live palette preview and contrast math. Falls back to the JS math below. */
+	let wasm = null;
+	if ( typeof wasm_bindgen !== 'undefined' && BSC.wasm_url ) {
+		wasm_bindgen( { module_or_path: BSC.wasm_url } ).then( () => {
+			wasm = wasm_bindgen;
+			render();
+		} ).catch( () => {} );
+	}
+
 	/* Extract dominant colors from an image via canvas (client-side seed suggestion). */
 	function extractColors( url, cb ) {
 		const img = new Image();
@@ -69,21 +79,67 @@
 		// --- Seeds ---
 		wrap.appendChild( el( 'h3', {}, '2 · Seed colors (1–3)' ) );
 		const seedRow = el( 'div', { class: 'bsc-qs-seeds' } );
+		const preview = el( 'div', { class: 'bsc-qs-preview' } );
+
+		/* Live palette composed in the browser by the WASM color engine. */
+		function swatchChip( label, hex, dark ) {
+			return el( 'span', { class: 'bsc-mini-swatch', title: label + ' ' + hex }, [
+				el( 'span', { class: 'bsc-mini-swatch-chip', style: 'background:' + hex }, null ),
+				el( 'span', { class: 'bsc-mini-swatch-label', style: dark ? 'color:#8a8a8a' : '' }, label ),
+			] );
+		}
+		function drawPalettePreview() {
+			preview.innerHTML = '';
+			if ( ! wasm ) {
+				preview.appendChild( el( 'p', { class: 'bsc-hint' }, 'Loading WASM color engine… the live palette preview appears once it is ready. (The server still composes the palette on Extrapolate.)' ) );
+				return;
+			}
+			let p;
+			try {
+				p = JSON.parse( wasm.compose_palette( JSON.stringify( qs.seeds ) ) );
+			} catch ( e ) {
+				return;
+			}
+			preview.appendChild( el( 'p', { class: 'bsc-hint' }, 'Live palette — composed in the browser from your seeds (OKLCH, contrast-gated).' ) );
+
+			const roles = el( 'div', { class: 'bsc-swatches' } );
+			[ 'primary', 'secondary', 'accent', 'surface', 'bg', 'ink', 'muted', 'border', 'primary_text', 'success', 'warning', 'danger' ].forEach( ( k ) => {
+				roles.appendChild( swatchChip( k.replace( '_', ' ' ), p[ k ] ) );
+			} );
+			preview.appendChild( roles );
+
+			const ramp = el( 'div', { class: 'bsc-swatches bsc-ramp' } );
+			[ '50', '100', '200', '300', '400', '500', '600', '700', '800', '900' ].forEach( ( step ) => {
+				ramp.appendChild( swatchChip( step, p.ramp[ step ] ) );
+			} );
+			preview.appendChild( el( 'p', { class: 'bsc-hint' }, 'Primary ramp (50–900)' ) );
+			preview.appendChild( ramp );
+
+			const dark = el( 'div', { class: 'bsc-swatches' } );
+			[ 'bg', 'surface', 'ink', 'muted', 'primary' ].forEach( ( k ) => {
+				dark.appendChild( swatchChip( 'dark ' + k, p.dark[ k ], true ) );
+			} );
+			preview.appendChild( el( 'p', { class: 'bsc-hint' }, 'Dark theme counterparts' ) );
+			preview.appendChild( dark );
+		}
+
 		function drawSeeds() {
 			seedRow.innerHTML = '';
 			qs.seeds.forEach( ( s, i ) => {
 				seedRow.appendChild( el( 'span', { class: 'bsc-qs-seed' }, [
-					el( 'input', { type: 'color', value: s, oninput: ( e ) => { qs.seeds[ i ] = e.target.value; } } ),
+					el( 'input', { type: 'color', value: s, oninput: ( e ) => { qs.seeds[ i ] = e.target.value; drawPalettePreview(); } } ),
 					el( 'button', { class: 'button bsc-x', type: 'button', onclick: () => { qs.seeds.splice( i, 1 ); drawSeeds(); } }, '×' ),
 				] ) );
 			} );
 			if ( qs.seeds.length < 3 ) {
 				seedRow.appendChild( el( 'button', { class: 'button', type: 'button', onclick: () => { qs.seeds.push( '#888888' ); drawSeeds(); } }, '+ Seed' ) );
 			}
+			drawPalettePreview();
 		}
 		drawSeeds();
 		wrap.appendChild( seedRow );
 		wrap.appendChild( el( 'p', { class: 'bsc-hint' }, 'Seed 1 = primary. Seed 2 (optional) = secondary; seed 3 (optional) = accent. Anything you leave out is composed for you in OKLCH around seed 1.' ) );
+		wrap.appendChild( preview );
 
 		// --- Type combo ---
 		wrap.appendChild( el( 'h3', {}, '3 · Type combo' ) );
@@ -305,6 +361,9 @@
 		return 0.2126 * rgb[ 0 ] + 0.7152 * rgb[ 1 ] + 0.0722 * rgb[ 2 ];
 	}
 	function ratio( a, b ) {
+		if ( wasm ) {
+			return wasm.contrast_ratio( a, b ).toFixed( 2 );
+		}
 		const l1 = lum( a ), l2 = lum( b );
 		return ( ( Math.max( l1, l2 ) + 0.05 ) / ( Math.min( l1, l2 ) + 0.05 ) ).toFixed( 2 );
 	}
