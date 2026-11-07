@@ -246,8 +246,13 @@
 		for (var i = 0; i < instances.length; i++) { instances[i].resize(); }
 	});
 
+	// Public math helpers. Packs capture a reference to this object and call
+	// the functions every frame, so the WASM module swaps implementations in
+	// place below without changing the reference (or the fallback behavior).
+	var utils = { hexToRgb: hexToRgb, rgba: rgba, mix: mix, lerp: lerp, clamp: clamp, smoothstep: smoothstep, noise2: noise2 };
+
 	var UltraBGs = {
-		utils: { hexToRgb: hexToRgb, rgba: rgba, mix: mix, lerp: lerp, clamp: clamp, smoothstep: smoothstep, noise2: noise2 },
+		utils: utils,
 		packs: registry,
 		registerPack: function (def) {
 			if (def && def.id && typeof def.render === 'function') { registry[def.id] = def; }
@@ -293,6 +298,31 @@
 		}
 	};
 	window.UltraBGs = UltraBGs;
+
+	/* ---------- WASM math (optional) ---------- */
+	// The `ultrabgs-math` module powers the shared utils in Rust WASM. It loads
+	// asynchronously and replaces the utils in place; every pack keeps working
+	// on the JS math above until (and if) the module arrives, so nothing breaks
+	// when WASM is missing or unsupported.
+	var wasm = null;
+	if (typeof wasm_bindgen !== 'undefined' && window.UltraBGsGlobal && window.UltraBGsGlobal.wasm_url) {
+		wasm_bindgen({ module_or_path: window.UltraBGsGlobal.wasm_url }).then(function () {
+			wasm = wasm_bindgen;
+			utils.hexToRgb = function (hex) {
+				var c = wasm.hex_to_rgb(hex);
+				return { r: c[0], g: c[1], b: c[2] };
+			};
+			utils.rgba = function (c, a) { return wasm.rgba(c.r, c.g, c.b, a); };
+			utils.mix = function (a, b, t) {
+				var c = wasm.mix(a.r, a.g, a.b, b.r, b.g, b.b, t);
+				return { r: c[0], g: c[1], b: c[2] };
+			};
+			utils.lerp = function (a, b, t) { return wasm.lerp(a, b, t); };
+			utils.clamp = function (v, a, b) { return wasm.clamp(v, a, b); };
+			utils.smoothstep = function (e0, e1, x) { return wasm.smoothstep(e0, e1, x); };
+			utils.noise2 = function (x, y) { return wasm.noise2(x, y); };
+		}).catch(function () { /* keep JS math */ });
+	}
 
 	function boot() {
 		// Full-page layer.

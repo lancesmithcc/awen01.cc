@@ -91,8 +91,8 @@ order follows value (purest, most-shared math first):
 |---|---|---|---|
 | 1 | `brandboss-color` | OKLCH engine + WCAG contrast + palette composition | this PR |
 | 2 | `brandboss-typography` | type scale / spacing scale / ratio math | planned |
-| 3 | `ultrabgs-math` | shared noise, easing, color mix used by all packs | planned |
-| 4 | `dlt-mode` | theme-mode resolution | this PR |
+| 3 | `ultrabgs-math` | shared noise, easing, color mix used by all packs | done |
+| 4 | `dlt-mode` | theme-mode resolution | done |
 | 5 | `yolo-scroll` | easing + text-scramble glyph stream | planned |
 | 6 | `cyclical-palettes` | date/time rule matching | planned |
 
@@ -115,10 +115,18 @@ wasm/
       src/
         lib.rs              # wasm-bindgen exports (resolve_mode, next_mode)
         mode.rs             # mode resolution + cycling
+    ultrabgs-math/
+      Cargo.toml            # crate-type = ["cdylib", "rlib"]
+      src/
+        lib.rs              # wasm-bindgen exports
+        noise.rs            # hash2 / noise2 (deterministic value noise)
+        easing.rs           # lerp / clamp / smoothstep
+        color.rs            # hexToRgb / mix / rgba
 ```
 
 The `rlib` crate-type keeps the same code runnable under `cargo test` on the
-host, so the math is verified against the PHP implementation without a browser.
+host, so the math is verified against the original implementation (PHP for
+BrandBoss, JavaScript for UltraBGs) without a browser.
 
 ### Build path (no `wasm-pack` required)
 
@@ -131,11 +139,14 @@ wasm-bindgen --target no-modules --no-typescript \
   target/wasm32-unknown-unknown/release/brandboss_color.wasm
 ```
 
-`wasm/build.sh` wraps this. The emitted files are committed (the site has no build
-step): `brandboss_color.js` (glue) and `brandboss_color_bg.wasm` (payload).
+`wasm/build.sh` wraps this for every crate; `ultrabgs-math` emits its glue and
+payload into `wp-content/plugins/ultrabgs/assets/wasm/`.
 
 ### Front-end loading
 
-The glue is enqueued as a normal classic script; `admin.js` initializes it
-asynchronously and falls back to its existing JavaScript math if the module is
-missing or unsupported, so nothing breaks when WASM is unavailable.
+The glue is enqueued as a normal classic script; `admin.js` (BrandBoss) and
+`engine.js` (UltraBGs) initialize their module asynchronously and fall back to
+their existing JavaScript math if the module is missing or unsupported, so
+nothing breaks when WASM is unavailable. UltraBGs swaps the `UltraBGs.utils`
+functions in place once the module is ready, so packs keep working with the JS
+math until (and unless) WASM loads.

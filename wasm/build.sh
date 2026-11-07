@@ -37,5 +37,8 @@ build_crate \
 	"dlt-mode" \
 	"dlt_mode" \
 	"${REPO_ROOT}/wp-content/plugins/awen01-dark-light-transcendent/assets/wasm"
+	"ultrabgs-math" \
+	"ultrabgs_math" \
+	"${REPO_ROOT}/wp-content/plugins/ultrabgs/assets/wasm"
 
 echo "✔ done"
