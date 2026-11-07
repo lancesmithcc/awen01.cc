@@ -20,6 +20,16 @@
 		} ).catch( () => {} );
 	}
 
+	/* WASM typography engine — optional. Powers the live type-scale, spacing
+	   and grid previews; falls back to the JS math below. */
+	let wasmTypography = null;
+	if ( typeof wasm_bindgen_typography !== 'undefined' && BSC.typography_wasm_url ) {
+		wasm_bindgen_typography( { module_or_path: BSC.typography_wasm_url } ).then( () => {
+			wasmTypography = wasm_bindgen_typography;
+			render();
+		} ).catch( () => {} );
+	}
+
 	/* Extract dominant colors from an image via canvas (client-side seed suggestion). */
 	function extractColors( url, cb ) {
 		const img = new Image();
@@ -368,6 +378,28 @@
 		return ( ( Math.max( l1, l2 ) + 0.05 ) / ( Math.min( l1, l2 ) + 0.05 ) ).toFixed( 2 );
 	}
 
+	/* Typography math (mirrors PHP BSC_Export::resolved_scale / resolved_spacing
+	   and BSC_GeneratePress::write_tokens_css). WASM when loaded, JS fallback. */
+	const DEFAULT_LEVELS = { caption: -1, body: 0, h6: 1, h5: 1, h4: 2, h3: 3, h2: 4, h1: 5 };
+
+	function typeScalePx( base, ratio, levels ) {
+		if ( wasmTypography ) {
+			return JSON.parse( wasmTypography.type_scale_px( base, ratio, JSON.stringify( levels ) ) );
+		}
+		const out = {};
+		Object.entries( levels ).forEach( ( [ name, step ] ) => {
+			out[ name ] = Math.round( base * Math.pow( ratio, step ) * 10 ) / 10;
+		} );
+		return out;
+	}
+
+	function spacingScalePx( base, scale ) {
+		if ( wasmTypography ) {
+			return JSON.parse( wasmTypography.spacing_px( base, JSON.stringify( scale ) ) );
+		}
+		return scale.map( ( m ) => Math.round( base * m * 10 ) / 10 );
+	}
+
 	/* AI text helper button. */
 	function aiButton( label, promptBuilder, apply ) {
 		return el( 'button', {
@@ -574,13 +606,43 @@
 		wrap.appendChild( box );
 
 		const s = state.typography.scale;
+		const scaleBox = el( 'div', { class: 'bsc-type-scale' } );
+		function drawScale() {
+			scaleBox.innerHTML = '';
+			const levels = s.levels || DEFAULT_LEVELS;
+			const base = s.base_px || 18;
+			const ratio = s.ratio || 1.25;
+			const scale = typeScalePx( base, ratio, levels );
+			const rows = el( 'div', { class: 'bsc-scale-rows' } );
+			Object.entries( scale ).forEach( ( [ name, px ] ) => {
+				rows.appendChild( el( 'div', { class: 'bsc-scale-row' }, [
+					el( 'code', {}, name + ' · ' + px + 'px' ),
+					el( 'p', { style: 'font-size:' + Math.min( px, 88 ) + 'px;line-height:' + ( px >= 32 ? state.typography.line_height.heading : state.typography.line_height.body ) }, 'The quiet authority of a well-set page' ),
+				] ) );
+			} );
+			scaleBox.appendChild( rows );
+			scaleBox.appendChild( el( 'p', { class: 'bsc-hint' },
+				wasmTypography
+					? 'Resolved live in the browser by the WASM module — base ' + base + 'px · ratio ' + ratio + '.'
+					: 'Resolved live with the built-in JS math — base ' + base + 'px · ratio ' + ratio + '.' ) );
+		}
+
+		wrap.appendChild( el( 'h3', {}, 'Type scale' ) );
 		wrap.appendChild( el( 'div', { class: 'bsc-grid-3' }, [
-			field( 'Base size (px)', num( s, 'base_px' ) ),
-			field( 'Scale ratio', num( s, 'ratio' ), 'e.g. 1.25 (major third), 1.333 (perfect fourth), 1.618 (golden)' ),
+			field( 'Base size (px)', el( 'input', {
+				type: 'number', step: 'any', value: s.base_px ?? '',
+				oninput: ( e ) => { s.base_px = parseFloat( e.target.value ) || 0; drawScale(); },
+			} ) ),
+			field( 'Scale ratio', el( 'input', {
+				type: 'number', step: 'any', value: s.ratio ?? '',
+				oninput: ( e ) => { s.ratio = parseFloat( e.target.value ) || 0; drawScale(); },
+			} ), 'e.g. 1.25 (major third), 1.333 (perfect fourth), 1.618 (golden)' ),
 			field( 'Body line-height', num( state.typography.line_height, 'body' ) ),
 			field( 'Heading line-height', num( state.typography.line_height, 'heading' ) ),
 		] ) );
+		wrap.appendChild( scaleBox );
 		wrap.appendChild( field( 'Typography notes', area( state.typography, 'notes', 3 ), 'Tracking, case rules, where each face is used…' ) );
+		drawScale();
 		return wrap;
 	}
 
@@ -588,21 +650,65 @@
 		const wrap = el( 'div' );
 		state.layout = state.layout || { grid_columns: 12, gutter_px: 24, margin: '', max_width_px: 1200, principles: [] };
 
+		const spacingBox = el( 'div', { class: 'bsc-spacing' } );
+		function drawSpacing() {
+			spacingBox.innerHTML = '';
+			const base = state.spacing.base_px || 8;
+			const px = spacingScalePx( base, state.spacing.scale || [] );
+			px.forEach( ( v, i ) => {
+				spacingBox.appendChild( el( 'div', { class: 'bsc-space-row' }, [
+					el( 'code', {}, 'space-' + ( i + 1 ) ),
+					el( 'span', { class: 'bsc-space-bar', style: 'width:' + Math.min( v, 320 ) + 'px' } ),
+					el( 'small', {}, v + 'px' ),
+				] ) );
+			} );
+		}
+
+		const gridBox = el( 'div', { class: 'bsc-gridviz-wrap' } );
+		function drawGrid() {
+			gridBox.innerHTML = '';
+			const cols = state.layout.grid_columns || 12;
+			const gutter = state.layout.gutter_px || 0;
+			const max = state.layout.max_width_px || 1200;
+			const col = wasmTypography
+				? wasmTypography.grid_column_width( max, cols, gutter )
+				: ( max - ( cols - 1 ) * gutter ) / cols;
+			gridBox.appendChild( el( 'div', {
+				class: 'bsc-gridviz',
+				style: '--cols:' + cols + ';--gut:' + gutter + 'px',
+			}, Array.from( { length: cols }, () => el( 'span' ) ) ) );
+			gridBox.appendChild( el( 'p', { class: 'bsc-hint' }, cols + ' columns · ' + gutter + 'px gutters · max width ' + max + 'px · column ≈ ' + ( Math.round( col * 100 ) / 100 ) + 'px' ) );
+		}
+
 		wrap.appendChild( el( 'h3', {}, 'Spacing system' ) );
-		wrap.appendChild( field( 'Base unit (px)', num( state.spacing, 'base_px' ) ) );
+		wrap.appendChild( field( 'Base unit (px)', el( 'input', {
+			type: 'number', step: 'any', value: state.spacing.base_px ?? '',
+			oninput: ( e ) => { state.spacing.base_px = parseFloat( e.target.value ) || 0; drawSpacing(); },
+		} ) ) );
 		wrap.appendChild( field( 'Scale multipliers (comma sep.)', el( 'input', {
 			type: 'text', value: state.spacing.scale.join( ', ' ),
-			oninput: ( e ) => { state.spacing.scale = e.target.value.split( ',' ).map( ( s ) => parseFloat( s ) ).filter( ( n ) => ! isNaN( n ) ); },
+			oninput: ( e ) => { state.spacing.scale = e.target.value.split( ',' ).map( ( s ) => parseFloat( s ) ).filter( ( n ) => ! isNaN( n ) ); drawSpacing(); },
 		} ), 'Multiplied by the base unit. Tokens become --bsc-space-1 …' ) );
+		wrap.appendChild( spacingBox );
 		wrap.appendChild( field( 'Spacing notes', area( state.spacing, 'notes', 3 ) ) );
 
 		wrap.appendChild( el( 'h3', {}, 'Grid & layout' ) );
 		wrap.appendChild( el( 'div', { class: 'bsc-grid-3' }, [
-			field( 'Grid columns', num( state.layout, 'grid_columns' ) ),
-			field( 'Gutter (px)', num( state.layout, 'gutter_px' ) ),
-			field( 'Max content width (px)', num( state.layout, 'max_width_px' ) ),
+			field( 'Grid columns', el( 'input', {
+				type: 'number', step: 'any', value: state.layout.grid_columns ?? '',
+				oninput: ( e ) => { state.layout.grid_columns = parseInt( e.target.value, 10 ) || 0; drawGrid(); },
+			} ) ),
+			field( 'Gutter (px)', el( 'input', {
+				type: 'number', step: 'any', value: state.layout.gutter_px ?? '',
+				oninput: ( e ) => { state.layout.gutter_px = parseFloat( e.target.value ) || 0; drawGrid(); },
+			} ) ),
+			field( 'Max content width (px)', el( 'input', {
+				type: 'number', step: 'any', value: state.layout.max_width_px ?? '',
+				oninput: ( e ) => { state.layout.max_width_px = parseFloat( e.target.value ) || 0; drawGrid(); },
+			} ) ),
 			field( 'Page margins', text( state.layout, 'margin', { placeholder: 'clamp(24px, 5vw, 96px)' } ) ),
 		] ) );
+		wrap.appendChild( gridBox );
 		wrap.appendChild( el( 'h3', {}, 'Composition principles' ) );
 		state.layout.principles = state.layout.principles || [];
 		wrap.appendChild( stringList( state.layout.principles, 'e.g. Leave a clear third for type on any hero image' ) );
@@ -624,6 +730,8 @@
 		wrap.appendChild( box );
 		wrap.appendChild( el( 'h3', {}, 'Allowed image aspect ratios' ) );
 		wrap.appendChild( stringList( state.ratios.image_aspects, '16:9' ) );
+		drawSpacing();
+		drawGrid();
 		return wrap;
 	}
 

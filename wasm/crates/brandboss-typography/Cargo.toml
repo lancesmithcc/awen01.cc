@@ -1,0 +1,15 @@
+[package]
+name = "brandboss-typography"
+version = "0.1.0"
+edition = "2021"
+description = "BrandBoss modular type scale + spacing scale + layout-ratio math, compiled to WebAssembly"
+license = "GPL-2.0-or-later"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2.130"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+indexmap = { version = "2", features = ["serde"] }

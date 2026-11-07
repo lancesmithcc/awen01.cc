@@ -89,8 +89,8 @@ order follows value (purest, most-shared math first):
 
 | # | Crate | Contents | Status |
 |---|---|---|---|
-| 1 | `brandboss-color` | OKLCH engine + WCAG contrast + palette composition | this PR |
-| 2 | `brandboss-typography` | type scale / spacing scale / ratio math | planned |
+| 1 | `brandboss-color` | OKLCH engine + WCAG contrast + palette composition | merged |
+| 2 | `brandboss-typography` | type scale / spacing scale / ratio math | done |
 | 3 | `ultrabgs-math` | shared noise, easing, color mix used by all packs | done |
 | 4 | `dlt-mode` | theme-mode resolution | done |
 | 5 | `yolo-scroll` | easing + text-scramble glyph stream | planned |
@@ -122,6 +122,13 @@ wasm/
         noise.rs            # hash2 / noise2 (deterministic value noise)
         easing.rs           # lerp / clamp / smoothstep
         color.rs            # hexToRgb / mix / rgba
+    brandboss-typography/
+      Cargo.toml            # crate-type = ["cdylib", "rlib"]
+      src/
+        lib.rs              # wasm-bindgen exports
+        scale.rs            # modular type scale (base 18, ratio 1.25)
+        spacing.rs          # 8px spacing scale
+        layout.rs           # layout-ratio math (aspect ratios, grid geometry)
 ```
 
 The `rlib` crate-type keeps the same code runnable under `cargo test` on the
@@ -137,16 +144,27 @@ cargo build --release --target wasm32-unknown-unknown -p brandboss-color
 wasm-bindgen --target no-modules --no-typescript \
   --out-dir wp-content/plugins/brandboss/assets/wasm \
   target/wasm32-unknown-unknown/release/brandboss_color.wasm
+
+# The typography module uses --no-modules-global so its init function does not
+# collide with the color module's (both are enqueued on the same admin page).
+cargo build --release --target wasm32-unknown-unknown -p brandboss-typography
+wasm-bindgen --target no-modules --no-typescript \
+  --no-modules-global wasm_bindgen_typography \
+  --out-dir wp-content/plugins/brandboss/assets/wasm \
+  target/wasm32-unknown-unknown/release/brandboss_typography.wasm
 ```
 
-`wasm/build.sh` wraps this for every crate; `ultrabgs-math` emits its glue and
-payload into `wp-content/plugins/ultrabgs/assets/wasm/`.
+`wasm/build.sh` wraps this for every crate. The emitted files are committed (the
+site has no build step): `brandboss_color.js` + `brandboss_color_bg.wasm`,
+`brandboss_typography.js` + `brandboss_typography_bg.wasm`, and the
+`ultrabgs-math` glue into `wp-content/plugins/ultrabgs/assets/wasm/`.
 
 ### Front-end loading
 
-The glue is enqueued as a normal classic script; `admin.js` (BrandBoss) and
-`engine.js` (UltraBGs) initialize their module asynchronously and fall back to
-their existing JavaScript math if the module is missing or unsupported, so
-nothing breaks when WASM is unavailable. UltraBGs swaps the `UltraBGs.utils`
-functions in place once the module is ready, so packs keep working with the JS
-math until (and unless) WASM loads.
+Each module's glue is enqueued as a normal classic script; `admin.js` (BrandBoss)
+and `engine.js` (UltraBGs) initialize their modules asynchronously and fall back
+to their existing JavaScript math if the module is missing or unsupported, so
+nothing breaks when WASM is unavailable. The color engine powers the live palette
+preview and contrast matrix; the typography module powers the live type scale,
+spacing scale, and grid previews; UltraBGs swaps its `UltraBGs.utils` functions in
+place once the module is ready.

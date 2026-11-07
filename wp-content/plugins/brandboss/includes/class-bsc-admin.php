@@ -33,7 +33,8 @@ class BSC_Admin {
 		wp_enqueue_media();
 		wp_enqueue_style( 'bsc-admin', BSC_URL . 'assets/admin.css', array(), BSC_VERSION );
 		wp_enqueue_script( 'bsc-wasm', BSC_URL . 'assets/wasm/brandboss_color.js', array(), BSC_VERSION, true );
-		wp_enqueue_script( 'bsc-admin', BSC_URL . 'assets/admin.js', array( 'wp-api-fetch', 'bsc-wasm' ), BSC_VERSION, true );
+		wp_enqueue_script( 'bsc-wasm-typography', BSC_URL . 'assets/wasm/brandboss_typography.js', array(), BSC_VERSION, true );
+		wp_enqueue_script( 'bsc-admin', BSC_URL . 'assets/admin.js', array( 'wp-api-fetch', 'bsc-wasm', 'bsc-wasm-typography' ), BSC_VERSION, true );
 
 		$guide_page = (int) get_option( 'bsc_guide_page_id' );
 
@@ -42,6 +43,7 @@ class BSC_Admin {
 			'keys'       => BSC_Keys::status(),
 			'gp_active'  => BSC_GeneratePress::is_gp_active(),
 			'wasm_url'   => BSC_URL . 'assets/wasm/brandboss_color_bg.wasm',
+			'typography_wasm_url' => BSC_URL . 'assets/wasm/brandboss_typography_bg.wasm',
 			'exports'    => array(
 				'json'   => BSC_Export::url() . '/brand.json',
 				'md'     => BSC_Export::url() . '/brand.md',
