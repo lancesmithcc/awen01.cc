@@ -569,6 +569,26 @@ function cydp_resolve_result( $settings, $awen_dlt_mode = null ) {
  * Front end output
  * ====================================================================== */
 
+/**
+ * Enqueue the WASM rule-matching glue (a classic no-modules script) in the
+ * head so the `wasm_bindgen` global is ready before the inline resolver below.
+ * The inline script falls back to its own JS math when this is absent.
+ */
+add_action( 'wp_enqueue_scripts', 'cydp_enqueue_wasm' );
+function cydp_enqueue_wasm() {
+	$s = cydp_get_settings();
+	if ( empty( $s['enabled'] ) ) {
+		return;
+	}
+	wp_enqueue_script(
+		'cydp-wasm',
+		plugin_dir_url( __FILE__ ) . 'assets/wasm/cyclical_palettes.js',
+		array(),
+		CYDP_VER,
+		false
+	);
+}
+
 add_action( 'wp_head', 'cydp_print_ssr', 110 );
 function cydp_print_ssr() {
 	$s = cydp_get_settings();
@@ -667,6 +687,7 @@ function cydp_print_js() {
 		'paletteKeys' => $palette_keys,
 		'rules'       => $rules,
 		'awenDlt'     => $awen_dlt,
+		'wasmUrl'     => plugin_dir_url( __FILE__ ) . 'assets/wasm/cyclical_palettes_bg.wasm',
 	);
 
 	$json = wp_json_encode( $config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
@@ -677,6 +698,13 @@ function cydp_print_js() {
 	var root = document.documentElement;
 	var paletteKeys = {}, pi;
 	for (pi = 0; pi < (cfg.paletteKeys || []).length; pi++) paletteKeys[cfg.paletteKeys[pi]] = true;
+	var wasm = null;
+	if (typeof wasm_bindgen_cydp !== 'undefined' && cfg.wasmUrl) {
+		wasm_bindgen_cydp({ module_or_path: cfg.wasmUrl }).then(function () {
+			wasm = wasm_bindgen_cydp;
+			apply();
+		}).catch(function () {});
+	}
 	function has(o,k){ return Object.prototype.hasOwnProperty.call(o,k); }
 	function pad(n){ return (n < 10 ? '0' : '') + n; }
 	function now(){
@@ -725,6 +753,12 @@ function cydp_print_js() {
 		return has(maps, m) ? m : (has(maps, 'dark') ? 'dark' : Object.keys(maps)[0]);
 	}
 	function resolve(){
+		if (wasm) {
+			try {
+				var t = now();
+				return JSON.parse(wasm.resolve(JSON.stringify(cfg), t.full, t.md, t.hm, awenDltMode()));
+			} catch (e) {}
+		}
 		var t = now(), matches = [], i, k;
 		for (i = 0; i < cfg.rules.length; i++) {
 			if (dateMatch(cfg.rules[i], t) && timeMatch(cfg.rules[i], t)) matches.push({ i: i, r: cfg.rules[i] });

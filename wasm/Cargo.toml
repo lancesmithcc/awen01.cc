@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/brandboss-color", "crates/dlt-mode", "crates/ultrabgs-math", "crates/brandboss-typography", "crates/yolo-scroll"]
+members = ["crates/brandboss-color", "crates/dlt-mode", "crates/ultrabgs-math", "crates/brandboss-typography", "crates/yolo-scroll", "crates/cyclical-palettes"]
 resolver = "2"
 
 [profile.release]
