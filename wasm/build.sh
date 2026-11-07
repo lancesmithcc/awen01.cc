@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build all BrandBoss WASM modules and place the glue + payload into the plugin.
+# Build all WASM modules and place the glue + payload into their plugins.
 #
 # Requires: rustc/cargo (with the `wasm32-unknown-unknown` target installed)
 # and the `wasm-bindgen` CLI on PATH. `wasm-pack` is NOT required.
@@ -32,5 +32,10 @@ build_crate \
 	"brandboss-color" \
 	"brandboss_color" \
 	"${REPO_ROOT}/wp-content/plugins/brandboss/assets/wasm"
+
+build_crate \
+	"dlt-mode" \
+	"dlt_mode" \
+	"${REPO_ROOT}/wp-content/plugins/awen01-dark-light-transcendent/assets/wasm"
 
 echo "✔ done"
