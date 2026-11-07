@@ -61,7 +61,7 @@ in JS; *AI calls, database, auth, and API keys never leave PHP*.
 
 | Layer | Functions | Target |
 |---|---|---|
-| Client — rule matching | date/time window matching, palette rule resolution, DLT mode map | WASM (later, `cyclical-palettes`) — CSS-var application stays JS |
+| Client — rule matching | date/time window matching, palette rule resolution, DLT mode map | WASM (`cyclical-palettes`) — CSS-var application stays JS |
 | Server | rule parsing/sanitizing, SSR, GP/GB color reading | **PHP** |
 
 ### taxonomy-query
@@ -94,7 +94,7 @@ order follows value (purest, most-shared math first):
 | 3 | `ultrabgs-math` | shared noise, easing, color mix used by all packs | done |
 | 4 | `dlt-mode` | theme-mode resolution | done |
 | 5 | `yolo-scroll` | easing/smoothstep, scroll-progress mapping, scramble/type-in glyph stream | done |
-| 6 | `cyclical-palettes` | date/time rule matching | planned |
+| 6 | `cyclical-palettes` | date/time rule matching | this PR |
 
 ### Crate layout
 

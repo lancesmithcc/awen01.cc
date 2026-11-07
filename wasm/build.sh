@@ -50,15 +50,27 @@ build_crate \
 	"dlt-mode" \
 	"dlt_mode" \
 	"${REPO_ROOT}/wp-content/plugins/awen01-dark-light-transcendent/assets/wasm"
+
+build_crate \
 	"ultrabgs-math" \
 	"ultrabgs_math" \
 	"${REPO_ROOT}/wp-content/plugins/ultrabgs/assets/wasm"
+
+build_crate \
 	"brandboss-typography" \
 	"brandboss_typography" \
 	"${REPO_ROOT}/wp-content/plugins/brandboss/assets/wasm" \
 	"wasm_bindgen_typography"
+
+build_crate \
 	"yolo-scroll" \
 	"yolo_scroll" \
 	"${REPO_ROOT}/wp-content/plugins/yolo-scroll/assets/wasm"
+
+build_crate \
+	"cyclical-palettes" \
+	"cyclical_palettes" \
+	"${REPO_ROOT}/wp-content/plugins/cyclical-dynamic-palettes/assets/wasm" \
+	"wasm_bindgen_cydp"
 
 echo "✔ done"
