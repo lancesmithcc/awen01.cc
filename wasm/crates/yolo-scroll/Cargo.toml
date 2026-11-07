@@ -1,0 +1,12 @@
+[package]
+name = "yolo-scroll"
+version = "0.1.0"
+edition = "2021"
+description = "Yolo Scroll deterministic animation math (easing, scroll progress, text scramble/type-in), compiled to WebAssembly"
+license = "GPL-2.0-or-later"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2.130"

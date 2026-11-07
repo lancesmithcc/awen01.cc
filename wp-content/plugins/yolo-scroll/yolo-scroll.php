@@ -213,9 +213,20 @@ if ( ! class_exists( 'Yolo_Scroll' ) ) {
             }
 
             wp_register_script(
+                'yolo-scroll-wasm',
+                $base_url . 'assets/wasm/yolo_scroll.js',
+                array(),
+                self::VERSION,
+                true
+            );
+
+            $script_deps = ! empty( $settings['enable_gsap_cdn'] ) ? array( 'gsap-scrolltrigger' ) : array();
+            $script_deps[] = 'yolo-scroll-wasm';
+
+            wp_register_script(
                 'yolo-scroll',
                 $base_url . 'assets/js/yolo-scroll.js',
-                ! empty( $settings['enable_gsap_cdn'] ) ? array( 'gsap-scrolltrigger' ) : array(),
+                $script_deps,
                 self::VERSION,
                 true
             );
@@ -226,6 +237,7 @@ if ( ! class_exists( 'Yolo_Scroll' ) ) {
                 array(
                     'enableGSAP'   => ! empty( $settings['enable_gsap_cdn'] ),
                     'enableNative' => ! empty( $settings['enable_native_engine'] ),
+                    'wasmUrl'      => $base_url . 'assets/wasm/yolo_scroll_bg.wasm',
                     'presets'      => self::preset_config(),
                     'helpers'      => self::generateblocks_helpers(),
                 )

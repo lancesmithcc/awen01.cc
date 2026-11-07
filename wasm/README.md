@@ -89,11 +89,11 @@ order follows value (purest, most-shared math first):
 
 | # | Crate | Contents | Status |
 |---|---|---|---|
-| 1 | `brandboss-color` | OKLCH engine + WCAG contrast + palette composition | merged |
+| 1 | `brandboss-color` | OKLCH engine + WCAG contrast + palette composition | merged (#2) |
 | 2 | `brandboss-typography` | type scale / spacing scale / ratio math | done |
 | 3 | `ultrabgs-math` | shared noise, easing, color mix used by all packs | done |
 | 4 | `dlt-mode` | theme-mode resolution | done |
-| 5 | `yolo-scroll` | easing + text-scramble glyph stream | planned |
+| 5 | `yolo-scroll` | easing/smoothstep, scroll-progress mapping, scramble/type-in glyph stream | done |
 | 6 | `cyclical-palettes` | date/time rule matching | planned |
 
 ### Crate layout
@@ -129,6 +129,13 @@ wasm/
         scale.rs            # modular type scale (base 18, ratio 1.25)
         spacing.rs          # 8px spacing scale
         layout.rs           # layout-ratio math (aspect ratios, grid geometry)
+    yolo-scroll/
+      Cargo.toml            # crate-type = ["cdylib", "rlib"]
+      src/
+        lib.rs              # wasm-bindgen exports
+        easing.rs           # clamp, smoothstep
+        progress.rs         # scroll-progress mapping
+        glyphs.rs           # hash seed, scramble/type-in glyph stream
 ```
 
 The `rlib` crate-type keeps the same code runnable under `cargo test` on the

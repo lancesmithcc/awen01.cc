@@ -19,13 +19,27 @@
     const SCROLL_TRIGGER_ID = 'yolo-scroll';
     let lastScrollY = window.scrollY || window.pageYOffset || 0;
 
+    // Optional WASM animation math. Loaded lazily (only when the page has
+    // animation elements) and used for easing, scroll-progress and the
+    // scramble/type-in glyph stream; the inline JS below is the fallback.
+    let wasm = null;
+    let wasmLoading = false;
+    const loadWasm = () => {
+        if (wasm || wasmLoading) return;
+        if (typeof wasm_bindgen === 'undefined' || !config.wasmUrl) return;
+        wasmLoading = true;
+        wasm_bindgen({ module_or_path: config.wasmUrl }).then(() => {
+            wasm = wasm_bindgen;
+        }).catch(() => {});
+    };
+
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
     const parseNumber = (value, fallback) => {
         const numeric = parseFloat(value);
         return Number.isFinite(numeric) ? numeric : fallback;
     };
 
-    const smoothstep = (value) => value * value * (3 - 2 * value);
+    const smoothstep = (value) => (wasm && wasm.smoothstep) ? wasm.smoothstep(value) : (value * value * (3 - 2 * value));
 
     const getClassTokenNumber = (element, prefix, fallback, divideBy = 1) => {
         const token = Array.from(element.classList || []).find((entry) => entry.startsWith(prefix));
@@ -111,6 +125,7 @@
     };
 
     const hashString = (value) => {
+        if (wasm && wasm.hash_string) return wasm.hash_string(String(value || ''));
         let hash = 0;
         const input = String(value || '');
         for (let index = 0; index < input.length; index += 1) {
@@ -170,11 +185,14 @@
             const glyphs = Array.from(original);
             const visibleCount = Math.floor(glyphs.length * progress);
             if (entry.settings.effect === 'type-in') {
-                const nextText = glyphs.slice(0, visibleCount).join('') + (progress > 0 && progress < 1 ? '▌' : '');
-                node.textContent = nextText;
+                node.textContent = (wasm && wasm.type_in_text)
+                    ? wasm.type_in_text(original, progress)
+                    : (glyphs.slice(0, visibleCount).join('') + (progress > 0 && progress < 1 ? '▌' : ''));
                 return;
             }
-            node.textContent = progress >= 1 ? original : renderScrambleText(original, visibleCount, seed + tickSeed);
+            node.textContent = progress >= 1 ? original : ((wasm && wasm.scramble_text)
+                ? wasm.scramble_text(original, progress, seed + tickSeed)
+                : renderScrambleText(original, visibleCount, seed + tickSeed));
         });
     };
 
@@ -222,10 +240,15 @@
         if (!element || typeof element.getBoundingClientRect !== 'function') return 0;
         const rect = element.getBoundingClientRect();
         const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
-        const startPx = viewportHeight * (settings.start / 100);
-        const endPx = viewportHeight * (settings.end / 100);
-        const range = (startPx - endPx) || 1;
-        let progress = clamp((startPx - rect.top) / range, 0, 1);
+        let progress;
+        if (wasm && wasm.scroll_progress) {
+            progress = wasm.scroll_progress(viewportHeight, settings.start, settings.end, rect.top);
+        } else {
+            const startPx = viewportHeight * (settings.start / 100);
+            const endPx = viewportHeight * (settings.end / 100);
+            const range = (startPx - endPx) || 1;
+            progress = clamp((startPx - rect.top) / range, 0, 1);
+        }
         if (progress < 1 && isScrolledToBottom() && rect.bottom > 0 && rect.top < viewportHeight) {
             progress = 1;
         }
@@ -782,6 +805,7 @@
         });
         if (animationElements.length) {
             document.documentElement.classList.add('sm-motion-ready');
+            loadWasm();
         }
     };
 

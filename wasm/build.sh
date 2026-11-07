@@ -57,5 +57,8 @@ build_crate \
 	"brandboss_typography" \
 	"${REPO_ROOT}/wp-content/plugins/brandboss/assets/wasm" \
 	"wasm_bindgen_typography"
+	"yolo-scroll" \
+	"yolo_scroll" \
+	"${REPO_ROOT}/wp-content/plugins/yolo-scroll/assets/wasm"
 
 echo "✔ done"
