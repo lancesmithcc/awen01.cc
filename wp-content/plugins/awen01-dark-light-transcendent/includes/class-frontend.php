@@ -111,10 +111,18 @@ class AWEN_DLT_Frontend {
 			AWEN_DLT_VERSION
 		);
 
+		wp_enqueue_script(
+			'awen-dlt-wasm',
+			AWEN_DLT_URL . 'assets/wasm/dlt_mode.js',
+			[],
+			AWEN_DLT_VERSION,
+			true
+		);
+
 		wp_register_script(
 			'awen-dlt-toggle',
 			AWEN_DLT_URL . 'assets/js/toggle.js',
-			[],
+			[ 'awen-dlt-wasm' ],
 			AWEN_DLT_VERSION,
 			true
 		);
@@ -124,6 +132,7 @@ class AWEN_DLT_Frontend {
 			'defaultMode' => isset( $settings['default_mode'] ) ? $settings['default_mode'] : 'auto',
 			'storageKey'  => 'awen-dlt-mode',
 			'modes'       => AWEN_DLT_Colors::MODES,
+			'wasmUrl'     => AWEN_DLT_URL . 'assets/wasm/dlt_mode_bg.wasm',
 		] );
 
 		wp_enqueue_script( 'awen-dlt-toggle' );

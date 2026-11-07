@@ -92,7 +92,7 @@ order follows value (purest, most-shared math first):
 | 1 | `brandboss-color` | OKLCH engine + WCAG contrast + palette composition | this PR |
 | 2 | `brandboss-typography` | type scale / spacing scale / ratio math | planned |
 | 3 | `ultrabgs-math` | shared noise, easing, color mix used by all packs | planned |
-| 4 | `dlt-mode` | theme-mode resolution | planned |
+| 4 | `dlt-mode` | theme-mode resolution | this PR |
 | 5 | `yolo-scroll` | easing + text-scramble glyph stream | planned |
 | 6 | `cyclical-palettes` | date/time rule matching | planned |
 
@@ -110,6 +110,11 @@ wasm/
         lib.rs              # wasm-bindgen exports
         color.rs            # hex/rgb/OKLCH conversions, compose, gate
         contrast.rs         # luminance/ratio/grade/matrix
+    dlt-mode/
+      Cargo.toml            # crate-type = ["cdylib", "rlib"]
+      src/
+        lib.rs              # wasm-bindgen exports (resolve_mode, next_mode)
+        mode.rs             # mode resolution + cycling
 ```
 
 The `rlib` crate-type keeps the same code runnable under `cargo test` on the
