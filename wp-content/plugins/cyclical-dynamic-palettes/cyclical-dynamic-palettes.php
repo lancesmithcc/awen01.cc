@@ -571,8 +571,8 @@ function cydp_resolve_result( $settings, $awen_dlt_mode = null ) {
 
 /**
  * Enqueue the WASM rule-matching glue (a classic no-modules script) in the
- * head so the `wasm_bindgen` global is ready before the inline resolver below.
- * The inline script falls back to its own JS math when this is absent.
+ * head so its `wasm_bindgen_cydp` global is ready before the inline resolver
+ * below. The inline script falls back to its own JS math when this is absent.
  */
 add_action( 'wp_enqueue_scripts', 'cydp_enqueue_wasm' );
 function cydp_enqueue_wasm() {
