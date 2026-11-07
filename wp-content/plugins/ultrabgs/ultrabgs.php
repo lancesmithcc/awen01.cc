@@ -118,7 +118,8 @@ add_filter( 'register_block_type_args', 'ultrabgs_inject_block_attributes', 10, 
 
 function ultrabgs_register_assets() {
 	wp_register_style( 'ultrabgs', ULTRABGS_URL . 'assets/css/ultrabgs.css', array(), ULTRABGS_VERSION );
-	wp_register_script( 'ultrabgs-engine', ULTRABGS_URL . 'assets/js/engine.js', array(), ULTRABGS_VERSION, true );
+	wp_register_script( 'ultrabgs-math', ULTRABGS_URL . 'assets/wasm/ultrabgs_math.js', array(), ULTRABGS_VERSION, true );
+	wp_register_script( 'ultrabgs-engine', ULTRABGS_URL . 'assets/js/engine.js', array( 'ultrabgs-math' ), ULTRABGS_VERSION, true );
 
 	foreach ( ultrabgs_get_packs() as $id => $pack ) {
 		wp_register_script( 'ultrabgs-pack-' . $id, $pack['script'], array( 'ultrabgs-engine' ), $pack['ver'], true );
@@ -150,9 +151,10 @@ function ultrabgs_maybe_enqueue_frontend() {
 	if ( $global_on || $block_use ) {
 		ultrabgs_enqueue_all_packs();
 		wp_localize_script( 'ultrabgs-engine', 'UltraBGsGlobal', array(
-			'enabled' => $global_on ? 1 : 0,
-			'pack'    => $settings['pack'],
-			'config'  => array(
+			'enabled'  => $global_on ? 1 : 0,
+			'pack'     => $settings['pack'],
+			'wasm_url' => ULTRABGS_URL . 'assets/wasm/ultrabgs_math_bg.wasm',
+			'config'   => array(
 				'colors'  => array( $settings['color1'], $settings['color2'], $settings['color3'] ),
 				'opacity' => (float) $settings['opacity'],
 				'speed'   => (float) $settings['speed'],
